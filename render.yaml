@@ -17,7 +17,10 @@ services:
         value: "24"
       - key: MIN_WHALE_USD
         value: "1000000"
-      # Optional API keys — add in Render dashboard (Settings > Environment)
+      # Supabase — Render 대시보드에서 직접 입력 (절대 커밋 금지)
+      # - key: SUPABASE_URL
+      # - key: SUPABASE_SERVICE_KEY
+      # Optional crypto API keys
       # - key: CRYPTOPANIC_API_KEY
       # - key: NEWSAPI_KEY
       # - key: ETHERSCAN_API_KEY
