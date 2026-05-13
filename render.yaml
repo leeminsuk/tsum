@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: tsum-crypto-intel
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DEFAULT_COIN
+        value: bitcoin
+      - key: INTERVAL_HOURS
+        value: "5"
+      - key: DEFAULT_HOURS
+        value: "24"
+      - key: MIN_WHALE_USD
+        value: "1000000"
+      # Optional API keys — add in Render dashboard (Settings > Environment)
+      # - key: CRYPTOPANIC_API_KEY
+      # - key: NEWSAPI_KEY
+      # - key: ETHERSCAN_API_KEY
+      # - key: WHALE_ALERT_API_KEY
+      # - key: COINGECKO_API_KEY

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSUM · Crypto Intel</title>
+<style>
+  :root {
+    --bg: #0d0d1a;
+    --surface: #13132a;
+    --surface2: #1a1a35;
+    --border: #2a2a4a;
+    --text: #e2e2f0;
+    --muted: #7070a0;
+    --buy: #00e676;
+    --sell: #ff5252;
+    --hold: #ffd740;
+    --accent: #7c6af7;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--accent); }
+  .logo span { color: var(--text); }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .badge-coin {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-weight: 500;
+  }
+  .btn:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ── Layout ── */
+  main { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .stat-box {
+    flex: 1;
+    min-width: 140px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .stat-value { font-size: 20px; font-weight: 700; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  #countdown { color: var(--accent); }
+
+  /* ── Signal Cards ── */
+  .section-title {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .signal-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card.latest { border-color: var(--accent); }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .action-badge {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 4px 14px;
+    border-radius: 6px;
+  }
+  .action-BUY { background: rgba(0,230,118,0.15); color: var(--buy); border: 1px solid rgba(0,230,118,0.3); }
+  .action-SELL { background: rgba(255,82,82,0.15); color: var(--sell); border: 1px solid rgba(255,82,82,0.3); }
+  .action-HOLD { background: rgba(255,215,64,0.15); color: var(--hold); border: 1px solid rgba(255,215,64,0.3); }
+
+  .coin-tag {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .card-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .latest-tag {
+    font-size: 10px;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Score / Confidence ── */
+  .metrics { display: flex; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+  .metric { flex: 1; min-width: 120px; }
+  .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  .metric-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--surface2);
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .metric-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .fill-score { background: linear-gradient(90deg, var(--sell), var(--hold), var(--buy)); }
+  .fill-confidence { background: var(--accent); }
+  .metric-val { font-size: 13px; font-weight: 600; }
+
+  /* ── Price ── */
+  .price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+  .price-val { font-size: 22px; font-weight: 700; }
+  .price-change { font-size: 13px; font-weight: 600; }
+  .price-change.pos { color: var(--buy); }
+  .price-change.neg { color: var(--sell); }
+
+  /* ── Details ── */
+  .rationale { margin-bottom: 10px; }
+  .rationale-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .rationale-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .rationale-list li {
+    font-size: 13px;
+    color: #a0a0c0;
+    padding-left: 14px;
+    position: relative;
+  }
+  .rationale-list li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); }
+
+  .risk-list li::before { content: '!'; color: var(--sell); }
+  .risk-list li { color: rgba(255,82,82,0.8); }
+
+  /* ── Headlines ── */
+  .headlines { margin-top: 10px; }
+  .headlines summary {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+  }
+  .headlines summary:hover { color: var(--text); }
+  .headline-item {
+    font-size: 12px;
+    color: #8080b0;
+    padding: 3px 0 3px 12px;
+    border-left: 2px solid var(--border);
+    margin-top: 4px;
+  }
+
+  /* ── Empty state ── */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 16px; margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; }
+
+  /* ── Settings Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 420px;
+    margin: 16px;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.7px; }
+  .field select, .field input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.25s;
+    pointer-events: none;
+    z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: none; }
+  .toast.ok { border-color: var(--buy); color: var(--buy); }
+  .toast.err { border-color: var(--sell); color: var(--sell); }
+
+  /* ── Spinner ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TSUM<span> INTEL</span></div>
+  <div class="header-right">
+    <span class="badge-coin" id="headerCoin">BTC</span>
+    <button class="btn" onclick="manualTrigger()" id="triggerBtn">지금 분석</button>
+    <button class="btn" onclick="openSettings()">설정</button>
+  </div>
+</header>
+
+<main>
+  <div class="status-bar">
+    <div class="stat-box">
+      <div class="stat-label">신호 수</div>
+      <div class="stat-value" id="signalCount">—</div>
+      <div class="stat-sub">최대 5개 유지</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">다음 분석까지</div>
+      <div class="stat-value" id="countdown">—</div>
+      <div class="stat-sub" id="nextRunTime">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">분석 주기</div>
+      <div class="stat-value" id="intervalDisplay">—</div>
+      <div class="stat-sub" id="coinDisplay">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">최신 시그널</div>
+      <div class="stat-value" id="latestAction">—</div>
+      <div class="stat-sub" id="latestScore">score —</div>
+    </div>
+  </div>
+
+  <div class="section-title">신호 스택 (최신순)</div>
+  <div class="signal-list" id="signalList">
+    <div class="empty">
+      <div class="empty-icon">📡</div>
+      <div class="empty-title">분석 데이터 로딩 중...</div>
+    </div>
+  </div>
+</main>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal" onclick="closeSettingsOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">설정</div>
+    <div class="field">
+      <label>분석 코인</label>
+      <select id="setCoin">
+        <option value="bitcoin">Bitcoin (BTC)</option>
+        <option value="ethereum">Ethereum (ETH)</option>
+        <option value="solana">Solana (SOL)</option>
+        <option value="dogecoin">Dogecoin (DOGE)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>분석 주기 (시간)</label>
+      <input type="number" id="setInterval" min="1" max="168" value="5">
+    </div>
+    <div class="field">
+      <label>고래 트랜잭션 최소 USD</label>
+      <input type="number" id="setWhaleUsd" min="100000" step="100000" value="1000000">
+    </div>
+    <div class="field">
+      <label>뉴스 조회 기간 (시간)</label>
+      <input type="number" id="setLookback" min="1" max="168" value="24">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeSettings()">취소</button>
+      <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const COIN_SYMBOLS = { bitcoin:'BTC', ethereum:'ETH', solana:'SOL', dogecoin:'DOGE' };
+let nextRunTs = null;
+let countdownTimer = null;
+
+// ── Fetch & Render ───────────────────────────────────────────────────────────
+
+async function fetchStatus() {
+  try {
+    const r = await fetch('/api/status');
+    const d = await r.json();
+    document.getElementById('signalCount').textContent = `${d.signal_count} / ${d.max_stack}`;
+    document.getElementById('intervalDisplay').textContent = `${d.settings.interval_hours}h`;
+    const coin = d.settings.coin || 'bitcoin';
+    document.getElementById('coinDisplay').textContent = coin.charAt(0).toUpperCase() + coin.slice(1);
+    document.getElementById('headerCoin').textContent = COIN_SYMBOLS[coin] || coin.toUpperCase();
+    if (d.next_run) {
+      nextRunTs = new Date(d.next_run).getTime();
+    }
+  } catch(e) { /* ignore */ }
+}
+
+async function fetchSignals() {
+  try {
+    const r = await fetch('/api/signals');
+    const signals = await r.json();
+    renderSignals(signals);
+    if (signals.length > 0) {
+      const s = signals[0];
+      const act = s.signal?.action || '—';
+      const score = s.signal?.score;
+      document.getElementById('latestAction').textContent = act;
+      document.getElementById('latestAction').style.color = act === 'BUY' ? 'var(--buy)' : act === 'SELL' ? 'var(--sell)' : 'var(--hold)';
+      document.getElementById('latestScore').textContent = score != null ? `score ${score.toFixed(3)}` : '—';
+    }
+  } catch(e) {
+    document.getElementById('signalList').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">데이터를 불러올 수 없습니다</div></div>';
+  }
+}
+
+function renderSignals(signals) {
+  const el = document.getElementById('signalList');
+  if (!signals || signals.length === 0) {
+    el.innerHTML = `<div class="empty">
+      <div class="empty-icon">📡</div>
+      <div class="empty-title">아직 분석 결과가 없습니다</div>
+      <div class="empty-sub">"지금 분석" 버튼을 눌러 첫 분석을 실행하세요</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = signals.map((s, i) => renderCard(s, i === 0)).join('');
+}
+
+function renderCard(s, isLatest) {
+  const sig = s.signal || {};
+  const action = sig.action || 'HOLD';
+  const score = sig.score ?? 0.5;
+  const conf = sig.confidence ?? 0;
+  const rationale = sig.rationale || [];
+  const risks = sig.risk_flags || [];
+  const coin = s.coin || 'bitcoin';
+  const summary = s.summary || {};
+  const headlines = summary.top_headlines || [];
+  const price = s.price_usd;
+  const change = s.price_change_24h;
+  const ts = s.generated_at ? new Date(s.generated_at) : null;
+  const timeStr = ts ? ts.toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+
+  const scoreBarPct = (score * 100).toFixed(1);
+  const confPct = (conf * 100).toFixed(1);
+
+  const priceHtml = price != null ? `
+    <div class="price-row">
+      <span class="price-val">$${Number(price).toLocaleString()}</span>
+      ${change != null ? `<span class="price-change ${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : ''}${Number(change).toFixed(2)}%</span>` : ''}
+    </div>` : '';
+
+  const rationaleHtml = rationale.length ? `
+    <div class="rationale">
+      <div class="rationale-title">근거</div>
+      <ul class="rationale-list">${rationale.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+    </div>` : '';
+
+  const riskHtml = risks.length ? `
+    <div class="rationale">
+      <div class="rationale-title">리스크</div>
+      <ul class="rationale-list risk-list">${risks.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+    </div>` : '';
+
+  const headlinesHtml = headlines.length ? `
+    <details class="headlines">
+      <summary>주요 헤드라인 ${headlines.length}개 보기</summary>
+      ${headlines.map(h => `<div class="headline-item">${esc(h)}</div>`).join('')}
+    </details>` : '';
+
+  return `
+  <div class="card${isLatest ? ' latest' : ''}">
+    <div class="card-header">
+      <div class="card-meta">
+        <span class="action-badge action-${action}">${action}</span>
+        <span class="coin-tag">${COIN_SYMBOLS[coin] || coin.toUpperCase()}</span>
+        ${isLatest ? '<span class="latest-tag">LATEST</span>' : ''}
+      </div>
+      <span class="card-time">${timeStr}</span>
+    </div>
+    ${priceHtml}
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">종합 점수</div>
+        <div class="metric-bar"><div class="metric-fill fill-score" style="width:${scoreBarPct}%"></div></div>
+        <div class="metric-val">${score.toFixed(3)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">신뢰도</div>
+        <div class="metric-bar"><div class="metric-fill fill-confidence" style="width:${confPct}%"></div></div>
+        <div class="metric-val">${(conf * 100).toFixed(0)}%</div>
+      </div>
+    </div>
+    ${rationaleHtml}
+    ${riskHtml}
+    ${headlinesHtml}
+  </div>`;
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Countdown ────────────────────────────────────────────────────────────────
+
+function startCountdown() {
+  if (countdownTimer) clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    if (!nextRunTs) { document.getElementById('countdown').textContent = '—'; return; }
+    const diff = nextRunTs - Date.now();
+    if (diff <= 0) {
+      document.getElementById('countdown').textContent = '곧 시작...';
+      return;
+    }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const sc = Math.floor((diff % 60000) / 1000);
+    document.getElementById('countdown').textContent =
+      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;
+    if (nextRunTs) {
+      const d = new Date(nextRunTs);
+      document.getElementById('nextRunTime').textContent =
+        d.toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+  }, 1000);
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────────
+
+async function manualTrigger() {
+  const btn = document.getElementById('triggerBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>분석 중...';
+  try {
+    const r = await fetch('/api/trigger', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+    const d = await r.json();
+    if (d.ok) {
+      showToast(`${d.action} (score: ${d.score?.toFixed(3)})`, 'ok');
+      await refresh();
+    } else {
+      showToast(d.detail || '오류 발생', 'err');
+    }
+  } catch(e) {
+    showToast('분석 요청 실패', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '지금 분석';
+  }
+}
+
+async function refresh() {
+  await Promise.all([fetchStatus(), fetchSignals()]);
+}
+
+// ── Settings Modal ───────────────────────────────────────────────────────────
+
+function openSettings() {
+  fetch('/api/settings').then(r=>r.json()).then(cfg => {
+    document.getElementById('setCoin').value = cfg.coin || 'bitcoin';
+    document.getElementById('setInterval').value = cfg.interval_hours || 5;
+    document.getElementById('setWhaleUsd').value = cfg.min_whale_usd || 1000000;
+    document.getElementById('setLookback').value = cfg.lookback_hours || 24;
+    document.getElementById('settingsModal').classList.add('open');
+  });
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function closeSettingsOnOverlay(e) {
+  if (e.target === document.getElementById('settingsModal')) closeSettings();
+}
+
+async function saveSettings() {
+  const body = {
+    coin: document.getElementById('setCoin').value,
+    interval_hours: parseInt(document.getElementById('setInterval').value),
+    min_whale_usd: parseInt(document.getElementById('setWhaleUsd').value),
+    lookback_hours: parseInt(document.getElementById('setLookback').value),
+  };
+  try {
+    const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (d.ok) {
+      showToast('설정 저장 완료', 'ok');
+      closeSettings();
+      await refresh();
+    } else {
+      showToast(d.detail || '저장 실패', 'err');
+    }
+  } catch(e) {
+    showToast('저장 중 오류 발생', 'err');
+  }
+}
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+
+let toastTimer = null;
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, 3000);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+
+async function init() {
+  await refresh();
+  startCountdown();
+  // Auto-refresh every 60s
+  setInterval(refresh, 60_000);
+}
+
+init();
+</script>
+</body>
+</html>

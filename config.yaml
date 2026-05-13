@@ -1,0 +1,48 @@
+agent:
+  name: Crypto Intelligence Agent
+  default_coin: bitcoin
+  default_hours: 24
+  min_whale_usd: 1000000
+  mock_when_no_key: true
+  request_timeout_sec: 15
+
+sentiment:
+  model_path: ./models/finetuned_cryptobert
+  base_model: ElKulako/cryptobert
+  labels:
+    0: bearish
+    1: neutral
+    2: bullish
+  bullish_threshold: 0.58
+  bearish_threshold: 0.42
+
+signal_engine:
+  weights:
+    sentiment: 0.35
+    fear_greed: 0.15
+    whale: 0.20
+    exchange_flow: 0.20
+    defi: 0.10
+  buy_threshold: 0.62
+  sell_threshold: 0.38
+  conflict_penalty: 0.12
+  high_confidence_threshold: 0.72
+
+coins:
+  bitcoin:
+    coingecko_id: bitcoin
+    symbol: BTC
+    chain: bitcoin
+  ethereum:
+    coingecko_id: ethereum
+    symbol: ETH
+    chain: ethereum
+    contract: ""
+  solana:
+    coingecko_id: solana
+    symbol: SOL
+    chain: solana
+  dogecoin:
+    coingecko_id: dogecoin
+    symbol: DOGE
+    chain: dogecoin
