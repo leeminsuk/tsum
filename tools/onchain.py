@@ -79,26 +79,55 @@ class OnchainAnalyzer:
         return self._mock_whales(coin, min_usd)
 
     def analyze_exchange_flow(self, coin: str) -> dict[str, Any]:
-        """Exchange netflow proxy.
+        """거래량 + 가격 방향으로 매수/매도 압력 추정.
 
-        Production options: CryptoQuant/Glassnode. Free prototype fallback uses CoinGecko price momentum + mock reserve proxy.
-        Positive net_flow_usd means exchange inflow pressure (potential sell pressure). Negative means outflow/accumulation.
+        vol_ratio > 1 + 가격 상승 → 매수 유입(bullish)
+        vol_ratio > 1 + 가격 하락 → 매도 압력(bearish)
+        vol_ratio < 0.7           → 거래 위축(neutral)
         """
-        # Without paid CryptoQuant/Glassnode, provide a transparent proxy/mocked state.
-        price = self.get_price(coin)
+        cg_id = self._coingecko_id(coin)
+        headers = {}
+        if env("COINGECKO_API_KEY"):
+            headers["x-cg-demo-api-key"] = env("COINGECKO_API_KEY") or ""
+        try:
+            # 7일치 일별 거래량 + 가격 조회
+            chart = self.http.get_json(
+                f"https://api.coingecko.com/api/v3/coins/{cg_id}/market_chart",
+                params={"vs_currency": "usd", "days": 7, "interval": "daily"},
+                headers=headers or None,
+            )
+            volumes = [v[1] for v in chart.get("total_volumes", [])]
+            prices  = [p[1] for p in chart.get("prices", [])]
+
+            if len(volumes) >= 3 and len(prices) >= 2:
+                avg_vol    = sum(volumes[:-1]) / max(len(volumes) - 1, 1)
+                vol_ratio  = volumes[-1] / avg_vol if avg_vol else 1.0
+                price_chg  = (prices[-1] - prices[-2]) / prices[-2] * 100 if prices[-2] else 0.0
+
+                if vol_ratio >= 1.2 and price_chg > 0:
+                    signal = "bullish"
+                elif vol_ratio >= 1.2 and price_chg < 0:
+                    signal = "bearish"
+                elif vol_ratio < 0.7:
+                    signal = "neutral"
+                else:
+                    signal = "neutral"
+
+                return {
+                    "coin":         coin,
+                    "volume_ratio": round(vol_ratio, 3),
+                    "price_chg_1d": round(price_chg, 3),
+                    "signal":       signal,
+                    "source":       "coingecko_volume",
+                }
+        except Exception as exc:
+            if not self.mock_when_no_key:
+                raise
+        # fallback
+        price  = self.get_price(coin)
         change = float(price.get("usd_24h_change") or 0.0)
-        pseudo_net = round(change * 750_000, 2)  # rising prices often correlate with inflow arbitrage; clearly marked proxy.
-        signal = "bearish" if pseudo_net > 0 else "bullish" if pseudo_net < 0 else "neutral"
-        return {
-            "coin": coin,
-            "inflow_usd": max(pseudo_net, 0.0),
-            "outflow_usd": max(-pseudo_net, 0.0),
-            "net_flow_usd": pseudo_net,
-            "signal": signal,
-            "magnitude_usd": abs(pseudo_net),
-            "source": "coingecko_proxy_not_true_exchange_flow",
-            "note": "For production, replace with CryptoQuant/Glassnode exchange reserve/netflow endpoints.",
-        }
+        signal = "bullish" if change < -2 else "bearish" if change > 2 else "neutral"
+        return {"coin": coin, "signal": signal, "source": "price_fallback"}
 
     def track_smart_money(self, coin: str, wallets: list[str] | None = None, min_usd: int = 100_000) -> dict[str, Any]:
         wallets = wallets or []

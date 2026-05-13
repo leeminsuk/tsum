@@ -270,6 +270,16 @@
   .toast.ok { border-color: var(--buy); color: var(--buy); }
   .toast.err { border-color: var(--sell); color: var(--sell); }
 
+  /* ── 기술적 지표 뱃지 ── */
+  .tech-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tech-badge {
+    font-size: 11px; font-weight: 700; padding: 3px 9px;
+    border-radius: 5px; letter-spacing: 0.4px;
+  }
+  .tech-bull { background: rgba(0,230,118,0.12); color: var(--buy);  border: 1px solid rgba(0,230,118,0.25); }
+  .tech-bear { background: rgba(255,82,82,0.12);  color: var(--sell); border: 1px solid rgba(255,82,82,0.25); }
+  .tech-neut { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
   /* ── Spinner ── */
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner {
@@ -433,12 +443,24 @@ function renderCard(s, isLatest) {
 
   const scoreBarPct = (score * 100).toFixed(1);
   const confPct = (conf * 100).toFixed(1);
+  const tech = summary.technical || {};
+  const techComponents = tech.components || {};
 
   const priceHtml = price != null ? `
     <div class="price-row">
       <span class="price-val">$${Number(price).toLocaleString()}</span>
       ${change != null ? `<span class="price-change ${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : ''}${Number(change).toFixed(2)}%</span>` : ''}
     </div>` : '';
+
+  // 기술적 지표 뱃지
+  const techBadges = Object.entries({
+    RSI:    techComponents.rsi     != null ? _techBadge('RSI',    techComponents.rsi)    : null,
+    MACD:   techComponents.macd    != null ? _techBadge('MACD',   techComponents.macd)   : null,
+    BB:     techComponents.bb      != null ? _techBadge('BB',     techComponents.bb)     : null,
+    '거래량': techComponents.volume != null ? _techBadge('거래량', techComponents.volume) : null,
+  }).filter(([,v]) => v).map(([,v]) => v).join('');
+
+  const techHtml = techBadges ? `<div class="tech-badges">${techBadges}</div>` : '';
 
   const rationaleHtml = rationale.length ? `
     <div class="rationale">
@@ -469,6 +491,7 @@ function renderCard(s, isLatest) {
       <span class="card-time">${timeStr}</span>
     </div>
     ${priceHtml}
+    ${techHtml}
     <div class="metrics">
       <div class="metric">
         <div class="metric-label">종합 점수</div>
@@ -489,6 +512,12 @@ function renderCard(s, isLatest) {
 
 function esc(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function _techBadge(label, score) {
+  const cls = score >= 0.60 ? 'bull' : score <= 0.40 ? 'bear' : 'neut';
+  const icon = score >= 0.60 ? '▲' : score <= 0.40 ? '▼' : '—';
+  return `<span class="tech-badge tech-${cls}">${icon} ${label}</span>`;
 }
 
 // ── Countdown ────────────────────────────────────────────────────────────────
