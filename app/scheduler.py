@@ -9,22 +9,36 @@ logger = logging.getLogger(__name__)
 _scheduler: BackgroundScheduler | None = None
 
 
-def _make_job(coin: str) -> None:
+def _crypto_job(coin: str) -> None:
     from app.runner import run_analysis
     try:
         run_analysis(coin=coin)
     except Exception as exc:
-        logger.error(f"Scheduled analysis failed: {exc}")
+        logger.error(f"Scheduled crypto analysis failed: {exc}")
+
+
+def _news_job() -> None:
+    from app.news_runner import run_news_analysis
+    try:
+        run_news_analysis()
+    except Exception as exc:
+        logger.error(f"Scheduled news analysis failed: {exc}")
 
 
 def start(interval_hours: int = 5, coin: str = "bitcoin") -> None:
     global _scheduler
     _scheduler = BackgroundScheduler(timezone="UTC")
     _scheduler.add_job(
-        _make_job,
+        _crypto_job,
         trigger=IntervalTrigger(hours=interval_hours),
         args=[coin],
         id="analysis",
+        replace_existing=True,
+    )
+    _scheduler.add_job(
+        _news_job,
+        trigger=IntervalTrigger(hours=interval_hours),
+        id="news_analysis",
         replace_existing=True,
     )
     _scheduler.start()
@@ -48,6 +62,10 @@ def reschedule(interval_hours: int, coin: str) -> None:
             args=[coin],
         )
         _scheduler.modify_job("analysis", args=[coin])
+        _scheduler.reschedule_job(
+            "news_analysis",
+            trigger=IntervalTrigger(hours=interval_hours),
+        )
 
 
 def stop() -> None:

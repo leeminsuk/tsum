@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from app import scheduler, storage
+from app import news_storage
 from app.settings_store import SUPPORTED_COINS, load as load_settings, save as save_settings
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
@@ -24,12 +25,17 @@ async def lifespan(app: FastAPI):
     cfg = load_settings()
     scheduler.start(interval_hours=cfg["interval_hours"], coin=cfg["coin"])
 
-    # Run initial analysis on cold start so the dashboard is never empty
     try:
         from app.runner import run_analysis
         run_analysis(coin=cfg["coin"])
     except Exception as exc:
-        logger.warning(f"Initial analysis skipped: {exc}")
+        logger.warning(f"Initial crypto analysis skipped: {exc}")
+
+    try:
+        from app.news_runner import run_news_analysis
+        run_news_analysis()
+    except Exception as exc:
+        logger.warning(f"Initial news analysis skipped: {exc}")
 
     yield
     scheduler.stop()
@@ -46,7 +52,7 @@ async def dashboard():
     return (STATIC_DIR / "index.html").read_text(encoding="utf-8")
 
 
-# ── API ────────────────────────────────────────────────────────────────────────
+# ── Crypto API ────────────────────────────────────────────────────────────────
 
 @app.get("/api/signals")
 async def get_signals():
@@ -96,7 +102,6 @@ async def update_settings(req: SettingsRequest):
 
     new_cfg = save_settings(updates)
 
-    # Reschedule if interval or coin changed
     if "interval_hours" in updates or "coin" in updates:
         scheduler.reschedule(new_cfg["interval_hours"], new_cfg["coin"])
 
@@ -106,3 +111,20 @@ async def update_settings(req: SettingsRequest):
 @app.get("/api/settings")
 async def get_settings():
     return load_settings()
+
+
+# ── News API ──────────────────────────────────────────────────────────────────
+
+@app.get("/api/news")
+async def get_news():
+    return news_storage.get_news()
+
+
+@app.post("/api/news/trigger")
+async def trigger_news():
+    from app.news_runner import run_news_analysis
+    try:
+        result = run_news_analysis()
+        return {"ok": True, "kr_sentiment": result.get("kr_sentiment"), "us_sentiment": result.get("us_sentiment")}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))

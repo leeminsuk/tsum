@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TSUM · Crypto Intel</title>
+<title>TSUM · Intel</title>
 <style>
   :root {
     --bg: #0d0d1a;
@@ -37,9 +37,39 @@
     top: 0;
     background: var(--bg);
     z-index: 10;
+    gap: 12px;
+    flex-wrap: wrap;
   }
   .logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--accent); }
   .logo span { color: var(--text); }
+
+  /* ── Toggle ── */
+  .mode-toggle {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .toggle-btn {
+    padding: 6px 18px;
+    border-radius: 20px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .toggle-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .toggle-btn:not(.active):hover { color: var(--text); }
+
   .header-right { display: flex; align-items: center; gap: 12px; }
   .badge-coin {
     background: var(--surface2);
@@ -70,6 +100,9 @@
   /* ── Layout ── */
   main { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
 
+  .view { display: none; }
+  .view.active { display: block; }
+
   /* ── Status Bar ── */
   .status-bar {
     display: flex;
@@ -90,7 +123,7 @@
   .stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
   #countdown { color: var(--accent); }
 
-  /* ── Signal Cards ── */
+  /* ── Section Title ── */
   .section-title {
     font-size: 13px;
     color: var(--muted);
@@ -100,6 +133,7 @@
   }
   .signal-list { display: flex; flex-direction: column; gap: 14px; }
 
+  /* ── Cards ── */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -149,7 +183,7 @@
     letter-spacing: 0.5px;
   }
 
-  /* ── Score / Confidence ── */
+  /* ── Metrics ── */
   .metrics { display: flex; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
   .metric { flex: 1; min-width: 120px; }
   .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
@@ -172,7 +206,7 @@
   .price-change.pos { color: var(--buy); }
   .price-change.neg { color: var(--sell); }
 
-  /* ── Details ── */
+  /* ── Rationale ── */
   .rationale { margin-bottom: 10px; }
   .rationale-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
   .rationale-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
@@ -183,7 +217,6 @@
     position: relative;
   }
   .rationale-list li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); }
-
   .risk-list li::before { content: '!'; color: var(--sell); }
   .risk-list li { color: rgba(255,82,82,0.8); }
 
@@ -205,7 +238,7 @@
     margin-top: 4px;
   }
 
-  /* ── Empty state ── */
+  /* ── Empty ── */
   .empty {
     text-align: center;
     padding: 60px 20px;
@@ -270,7 +303,7 @@
   .toast.ok { border-color: var(--buy); color: var(--buy); }
   .toast.err { border-color: var(--sell); color: var(--sell); }
 
-  /* ── 기술적 지표 뱃지 ── */
+  /* ── Tech Badges ── */
   .tech-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
   .tech-badge {
     font-size: 11px; font-weight: 700; padding: 3px 9px;
@@ -279,6 +312,96 @@
   .tech-bull { background: rgba(0,230,118,0.12); color: var(--buy);  border: 1px solid rgba(0,230,118,0.25); }
   .tech-bear { background: rgba(255,82,82,0.12);  color: var(--sell); border: 1px solid rgba(255,82,82,0.25); }
   .tech-neut { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── News Cards ── */
+  .news-grid { display: flex; flex-direction: column; gap: 14px; }
+  .news-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    transition: border-color 0.15s;
+  }
+  .news-card:hover { border-color: var(--accent); }
+  .news-card.latest { border-color: var(--accent); }
+
+  .news-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .news-markets { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .market-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 5px;
+    letter-spacing: 0.5px;
+  }
+  .market-KR { background: rgba(0,100,255,0.15); color: #5599ff; border: 1px solid rgba(0,100,255,0.3); }
+  .market-US { background: rgba(255,200,0,0.12); color: #ffcc44; border: 1px solid rgba(255,200,0,0.3); }
+
+  .sentiment-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .sent-bullish { background: rgba(0,230,118,0.15); color: var(--buy); border: 1px solid rgba(0,230,118,0.3); }
+  .sent-bearish { background: rgba(255,82,82,0.15); color: var(--sell); border: 1px solid rgba(255,82,82,0.3); }
+  .sent-neutral { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .news-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .news-sections { grid-template-columns: 1fr; } }
+
+  .news-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .news-summary {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .news-points { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .news-points li {
+    font-size: 12px;
+    color: #a0a0c0;
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .news-points li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); }
+
+  .news-source-tag {
+    display: inline-block;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 7px;
+    margin-left: 6px;
+  }
+
+  /* ── News Status Bar ── */
+  .news-status-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
 
   /* ── Spinner ── */
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -298,42 +421,84 @@
 
 <header>
   <div class="logo">TSUM<span> INTEL</span></div>
-  <div class="header-right">
+
+  <!-- Mode Toggle -->
+  <div class="mode-toggle">
+    <button class="toggle-btn active" id="toggleCrypto" onclick="switchView('crypto')">₿ 비트코인</button>
+    <button class="toggle-btn" id="toggleNews" onclick="switchView('news')">📰 뉴스</button>
+  </div>
+
+  <div class="header-right" id="cryptoHeaderRight">
     <span class="badge-coin" id="headerCoin">BTC</span>
     <button class="btn" onclick="manualTrigger()" id="triggerBtn">지금 분석</button>
     <button class="btn" onclick="openSettings()">설정</button>
   </div>
+  <div class="header-right" id="newsHeaderRight" style="display:none">
+    <button class="btn" onclick="manualNewsTrigger()" id="newsTriggerBtn">뉴스 새로고침</button>
+  </div>
 </header>
 
 <main>
-  <div class="status-bar">
-    <div class="stat-box">
-      <div class="stat-label">신호 수</div>
-      <div class="stat-value" id="signalCount">—</div>
-      <div class="stat-sub">최대 5개 유지</div>
+  <!-- ══ Crypto View ════════════════════════════════════════════════════════ -->
+  <div class="view active" id="cryptoView">
+    <div class="status-bar">
+      <div class="stat-box">
+        <div class="stat-label">신호 수</div>
+        <div class="stat-value" id="signalCount">—</div>
+        <div class="stat-sub">최대 5개 유지</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">다음 분석까지</div>
+        <div class="stat-value" id="countdown">—</div>
+        <div class="stat-sub" id="nextRunTime">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">분석 주기</div>
+        <div class="stat-value" id="intervalDisplay">—</div>
+        <div class="stat-sub" id="coinDisplay">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">최신 시그널</div>
+        <div class="stat-value" id="latestAction">—</div>
+        <div class="stat-sub" id="latestScore">score —</div>
+      </div>
     </div>
-    <div class="stat-box">
-      <div class="stat-label">다음 분석까지</div>
-      <div class="stat-value" id="countdown">—</div>
-      <div class="stat-sub" id="nextRunTime">—</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-label">분석 주기</div>
-      <div class="stat-value" id="intervalDisplay">—</div>
-      <div class="stat-sub" id="coinDisplay">—</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-label">최신 시그널</div>
-      <div class="stat-value" id="latestAction">—</div>
-      <div class="stat-sub" id="latestScore">score —</div>
+
+    <div class="section-title">신호 스택 (최신순)</div>
+    <div class="signal-list" id="signalList">
+      <div class="empty">
+        <div class="empty-icon">📡</div>
+        <div class="empty-title">분석 데이터 로딩 중...</div>
+      </div>
     </div>
   </div>
 
-  <div class="section-title">신호 스택 (최신순)</div>
-  <div class="signal-list" id="signalList">
-    <div class="empty">
-      <div class="empty-icon">📡</div>
-      <div class="empty-title">분석 데이터 로딩 중...</div>
+  <!-- ══ News View ══════════════════════════════════════════════════════════ -->
+  <div class="view" id="newsView">
+    <div class="status-bar">
+      <div class="stat-box">
+        <div class="stat-label">뉴스 요약 수</div>
+        <div class="stat-value" id="newsCount">—</div>
+        <div class="stat-sub">최대 5개 유지</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">한국 증시</div>
+        <div class="stat-value" id="latestKrSentiment">—</div>
+        <div class="stat-sub">KOSPI / KOSDAQ</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">미국 증시</div>
+        <div class="stat-value" id="latestUsSentiment">—</div>
+        <div class="stat-sub">S&P500 / NASDAQ</div>
+      </div>
+    </div>
+
+    <div class="section-title">주식 뉴스 요약 (최신순)</div>
+    <div class="news-grid" id="newsList">
+      <div class="empty">
+        <div class="empty-icon">📰</div>
+        <div class="empty-title">뉴스 데이터 로딩 중...</div>
+      </div>
     </div>
   </div>
 </main>
@@ -377,8 +542,22 @@
 const COIN_SYMBOLS = { bitcoin:'BTC', ethereum:'ETH', solana:'SOL', dogecoin:'DOGE' };
 let nextRunTs = null;
 let countdownTimer = null;
+let currentView = 'crypto';
 
-// ── Fetch & Render ───────────────────────────────────────────────────────────
+// ── View Toggle ──────────────────────────────────────────────────────────────
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('cryptoView').classList.toggle('active', view === 'crypto');
+  document.getElementById('newsView').classList.toggle('active', view === 'news');
+  document.getElementById('toggleCrypto').classList.toggle('active', view === 'crypto');
+  document.getElementById('toggleNews').classList.toggle('active', view === 'news');
+  document.getElementById('cryptoHeaderRight').style.display = view === 'crypto' ? 'flex' : 'none';
+  document.getElementById('newsHeaderRight').style.display = view === 'news' ? 'flex' : 'none';
+  if (view === 'news') fetchNews();
+}
+
+// ── Crypto: Fetch & Render ───────────────────────────────────────────────────
 
 async function fetchStatus() {
   try {
@@ -389,9 +568,7 @@ async function fetchStatus() {
     const coin = d.settings.coin || 'bitcoin';
     document.getElementById('coinDisplay').textContent = coin.charAt(0).toUpperCase() + coin.slice(1);
     document.getElementById('headerCoin').textContent = COIN_SYMBOLS[coin] || coin.toUpperCase();
-    if (d.next_run) {
-      nextRunTs = new Date(d.next_run).getTime();
-    }
+    if (d.next_run) nextRunTs = new Date(d.next_run).getTime();
   } catch(e) { /* ignore */ }
 }
 
@@ -452,7 +629,6 @@ function renderCard(s, isLatest) {
       ${change != null ? `<span class="price-change ${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : ''}${Number(change).toFixed(2)}%</span>` : ''}
     </div>` : '';
 
-  // 기술적 지표 뱃지
   const techBadges = Object.entries({
     RSI:    techComponents.rsi     != null ? _techBadge('RSI',    techComponents.rsi)    : null,
     MACD:   techComponents.macd    != null ? _techBadge('MACD',   techComponents.macd)   : null,
@@ -510,14 +686,94 @@ function renderCard(s, isLatest) {
   </div>`;
 }
 
-function esc(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
 function _techBadge(label, score) {
   const cls = score >= 0.60 ? 'bull' : score <= 0.40 ? 'bear' : 'neut';
   const icon = score >= 0.60 ? '▲' : score <= 0.40 ? '▼' : '—';
   return `<span class="tech-badge tech-${cls}">${icon} ${label}</span>`;
+}
+
+// ── News: Fetch & Render ─────────────────────────────────────────────────────
+
+async function fetchNews() {
+  try {
+    const r = await fetch('/api/news');
+    const newsList = await r.json();
+    renderNews(newsList);
+    document.getElementById('newsCount').textContent = `${newsList.length} / 5`;
+    if (newsList.length > 0) {
+      const latest = newsList[0];
+      document.getElementById('latestKrSentiment').textContent = sentimentLabel(latest.kr_sentiment);
+      document.getElementById('latestKrSentiment').style.color = sentimentColor(latest.kr_sentiment);
+      document.getElementById('latestUsSentiment').textContent = sentimentLabel(latest.us_sentiment);
+      document.getElementById('latestUsSentiment').style.color = sentimentColor(latest.us_sentiment);
+    }
+  } catch(e) {
+    document.getElementById('newsList').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">뉴스를 불러올 수 없습니다</div></div>';
+  }
+}
+
+function renderNews(list) {
+  const el = document.getElementById('newsList');
+  if (!list || list.length === 0) {
+    el.innerHTML = `<div class="empty">
+      <div class="empty-icon">📰</div>
+      <div class="empty-title">아직 뉴스 요약이 없습니다</div>
+      <div class="empty-sub">"뉴스 새로고침" 버튼을 눌러 분석을 시작하세요</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = list.map((item, i) => renderNewsCard(item, i === 0)).join('');
+}
+
+function renderNewsCard(item, isLatest) {
+  const ts = item.generated_at ? new Date(item.generated_at) : null;
+  const timeStr = ts ? ts.toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+  const krSent = item.kr_sentiment || 'neutral';
+  const usSent = item.us_sentiment || 'neutral';
+  const krPoints = item.kr_points || [];
+  const usPoints = item.us_points || [];
+  const source = item.source || '';
+
+  const krPointsHtml = krPoints.length
+    ? `<ul class="news-points">${krPoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
+  const usPointsHtml = usPoints.length
+    ? `<ul class="news-points">${usPoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
+
+  return `
+  <div class="news-card${isLatest ? ' latest' : ''}">
+    <div class="news-card-header">
+      <div class="news-markets">
+        <span class="market-badge market-KR">🇰🇷 KR</span>
+        <span class="sentiment-badge sent-${krSent}">${sentimentLabel(krSent)}</span>
+        <span style="margin: 0 4px; color: var(--border)">|</span>
+        <span class="market-badge market-US">🇺🇸 US</span>
+        <span class="sentiment-badge sent-${usSent}">${sentimentLabel(usSent)}</span>
+        ${isLatest ? '<span class="latest-tag">LATEST</span>' : ''}
+        ${source === 'tavily+openai' ? '<span class="news-source-tag">AI 요약</span>' : source === 'fallback' ? '<span class="news-source-tag">오류</span>' : ''}
+      </div>
+      <span class="card-time">${timeStr}</span>
+    </div>
+    <div class="news-sections">
+      <div>
+        <div class="news-section-title">🇰🇷 한국 증시</div>
+        <div class="news-summary">${esc(item.kr_summary || '')}</div>
+        ${krPointsHtml}
+      </div>
+      <div>
+        <div class="news-section-title">🇺🇸 미국 증시</div>
+        <div class="news-summary">${esc(item.us_summary || '')}</div>
+        ${usPointsHtml}
+      </div>
+    </div>
+  </div>`;
+}
+
+function sentimentLabel(s) {
+  return s === 'bullish' ? '강세' : s === 'bearish' ? '약세' : '중립';
+}
+
+function sentimentColor(s) {
+  return s === 'bullish' ? 'var(--buy)' : s === 'bearish' ? 'var(--sell)' : 'var(--hold)';
 }
 
 // ── Countdown ────────────────────────────────────────────────────────────────
@@ -527,10 +783,7 @@ function startCountdown() {
   countdownTimer = setInterval(() => {
     if (!nextRunTs) { document.getElementById('countdown').textContent = '—'; return; }
     const diff = nextRunTs - Date.now();
-    if (diff <= 0) {
-      document.getElementById('countdown').textContent = '곧 시작...';
-      return;
-    }
+    if (diff <= 0) { document.getElementById('countdown').textContent = '곧 시작...'; return; }
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const sc = Math.floor((diff % 60000) / 1000);
@@ -555,7 +808,7 @@ async function manualTrigger() {
     const d = await r.json();
     if (d.ok) {
       showToast(`${d.action} (score: ${d.score?.toFixed(3)})`, 'ok');
-      await refresh();
+      await refreshCrypto();
     } else {
       showToast(d.detail || '오류 발생', 'err');
     }
@@ -567,7 +820,28 @@ async function manualTrigger() {
   }
 }
 
-async function refresh() {
+async function manualNewsTrigger() {
+  const btn = document.getElementById('newsTriggerBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>분석 중...';
+  try {
+    const r = await fetch('/api/news/trigger', { method:'POST', headers:{'Content-Type':'application/json'} });
+    const d = await r.json();
+    if (d.ok) {
+      showToast(`KR: ${sentimentLabel(d.kr_sentiment)} / US: ${sentimentLabel(d.us_sentiment)}`, 'ok');
+      await fetchNews();
+    } else {
+      showToast(d.detail || '오류 발생', 'err');
+    }
+  } catch(e) {
+    showToast('뉴스 요청 실패', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '뉴스 새로고침';
+  }
+}
+
+async function refreshCrypto() {
   await Promise.all([fetchStatus(), fetchSignals()]);
 }
 
@@ -604,7 +878,7 @@ async function saveSettings() {
     if (d.ok) {
       showToast('설정 저장 완료', 'ok');
       closeSettings();
-      await refresh();
+      await refreshCrypto();
     } else {
       showToast(d.detail || '저장 실패', 'err');
     }
@@ -615,22 +889,25 @@ async function saveSettings() {
 
 // ── Toast ────────────────────────────────────────────────────────────────────
 
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 let toastTimer = null;
 function showToast(msg, type = 'ok') {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.className = `toast show ${type}`;
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = 'toast'; }, 3000);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, 3500);
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 
 async function init() {
-  await refresh();
+  await refreshCrypto();
   startCountdown();
-  // Auto-refresh every 60s
-  setInterval(refresh, 60_000);
+  setInterval(refreshCrypto, 60_000);
 }
 
 init();
