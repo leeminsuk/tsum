@@ -1,20 +1,26 @@
 from __future__ import annotations
 
 import logging
+import time
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 logger = logging.getLogger(__name__)
 
+COINS = ["bitcoin", "ethereum", "solana", "dogecoin"]
+
 _scheduler: BackgroundScheduler | None = None
 
 
-def _crypto_job(coin: str) -> None:
+def _all_coins_job() -> None:
     from app.runner import run_analysis
-    try:
-        run_analysis(coin=coin)
-    except Exception as exc:
-        logger.error(f"Scheduled crypto analysis failed: {exc}")
+    for coin in COINS:
+        try:
+            run_analysis(coin=coin)
+            time.sleep(2)  # CoinGecko rate limit 간격
+        except Exception as exc:
+            logger.error(f"Scheduled analysis failed for {coin}: {exc}")
 
 
 def _news_job() -> None:
@@ -25,13 +31,12 @@ def _news_job() -> None:
         logger.error(f"Scheduled news analysis failed: {exc}")
 
 
-def start(interval_hours: int = 5, coin: str = "bitcoin") -> None:
+def start(interval_hours: int = 5) -> None:
     global _scheduler
     _scheduler = BackgroundScheduler(timezone="UTC")
     _scheduler.add_job(
-        _crypto_job,
+        _all_coins_job,
         trigger=IntervalTrigger(hours=interval_hours),
-        args=[coin],
         id="analysis",
         replace_existing=True,
     )
@@ -54,18 +59,10 @@ def get_next_run() -> str | None:
     return None
 
 
-def reschedule(interval_hours: int, coin: str) -> None:
+def reschedule(interval_hours: int) -> None:
     if _scheduler:
-        _scheduler.reschedule_job(
-            "analysis",
-            trigger=IntervalTrigger(hours=interval_hours),
-            args=[coin],
-        )
-        _scheduler.modify_job("analysis", args=[coin])
-        _scheduler.reschedule_job(
-            "news_analysis",
-            trigger=IntervalTrigger(hours=interval_hours),
-        )
+        _scheduler.reschedule_job("analysis", trigger=IntervalTrigger(hours=interval_hours))
+        _scheduler.reschedule_job("news_analysis", trigger=IntervalTrigger(hours=interval_hours))
 
 
 def stop() -> None:

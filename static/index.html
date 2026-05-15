@@ -19,78 +19,36 @@
     --radius: 12px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
-    min-height: 100vh;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; }
 
   /* ── Header ── */
   header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 10;
-    gap: 12px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
+    gap: 12px; flex-wrap: wrap;
   }
-  .logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--accent); }
+  .logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--accent); flex-shrink: 0; }
   .logo span { color: var(--text); }
 
-  /* ── Toggle ── */
+  /* ── Mode Toggle (비트코인 / 뉴스) ── */
   .mode-toggle {
-    display: flex;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 3px;
-    gap: 2px;
+    display: flex; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 24px; padding: 3px; gap: 2px;
   }
   .toggle-btn {
-    padding: 6px 18px;
-    border-radius: 20px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
+    padding: 6px 18px; border-radius: 20px; border: none;
+    background: transparent; color: var(--muted);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;
   }
-  .toggle-btn.active {
-    background: var(--accent);
-    color: #fff;
-  }
+  .toggle-btn.active { background: var(--accent); color: #fff; }
   .toggle-btn:not(.active):hover { color: var(--text); }
 
-  .header-right { display: flex; align-items: center; gap: 12px; }
-  .badge-coin {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
+  .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: background 0.15s;
-    font-weight: 500;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+    transition: background 0.15s; font-weight: 500; white-space: nowrap;
   }
   .btn:hover { background: var(--accent); border-color: var(--accent); }
   .btn-primary { background: var(--accent); border-color: var(--accent); }
@@ -98,25 +56,31 @@
   .btn:disabled { opacity: 0.4; cursor: default; }
 
   /* ── Layout ── */
-  main { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
-
+  main { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
   .view { display: none; }
   .view.active { display: block; }
 
-  /* ── Status Bar ── */
-  .status-bar {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
+  /* ── Coin Tabs ── */
+  .coin-tabs {
+    display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
   }
+  .coin-tab {
+    padding: 8px 20px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .coin-tab:hover { border-color: var(--accent); color: var(--text); }
+  .coin-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .coin-tab .coin-change {
+    font-size: 11px; font-weight: 500; margin-left: 4px; opacity: 0.8;
+  }
+
+  /* ── Status Bar ── */
+  .status-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
   .stat-box {
-    flex: 1;
-    min-width: 140px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
+    flex: 1; min-width: 130px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px;
   }
   .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
   .stat-value { font-size: 20px; font-weight: 700; }
@@ -124,76 +88,31 @@
   #countdown { color: var(--accent); }
 
   /* ── Section Title ── */
-  .section-title {
-    font-size: 13px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 14px;
-  }
+  .section-title { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
   .signal-list { display: flex; flex-direction: column; gap: 14px; }
 
-  /* ── Cards ── */
+  /* ── Signal Cards ── */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    transition: border-color 0.15s;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; transition: border-color 0.15s;
   }
   .card:hover { border-color: var(--accent); }
   .card.latest { border-color: var(--accent); }
-
-  .card-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    gap: 12px;
-  }
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
   .card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .action-badge {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    padding: 4px 14px;
-    border-radius: 6px;
-  }
-  .action-BUY { background: rgba(0,230,118,0.15); color: var(--buy); border: 1px solid rgba(0,230,118,0.3); }
-  .action-SELL { background: rgba(255,82,82,0.15); color: var(--sell); border: 1px solid rgba(255,82,82,0.3); }
+  .action-badge { font-size: 15px; font-weight: 800; letter-spacing: 1px; padding: 4px 14px; border-radius: 6px; }
+  .action-BUY  { background: rgba(0,230,118,0.15); color: var(--buy);  border: 1px solid rgba(0,230,118,0.3); }
+  .action-SELL { background: rgba(255,82,82,0.15);  color: var(--sell); border: 1px solid rgba(255,82,82,0.3); }
   .action-HOLD { background: rgba(255,215,64,0.15); color: var(--hold); border: 1px solid rgba(255,215,64,0.3); }
-
-  .coin-tag {
-    font-size: 12px;
-    color: var(--muted);
-    background: var(--surface2);
-    padding: 3px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
+  .coin-tag { font-size: 12px; color: var(--muted); background: var(--surface2); padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-weight: 600; }
   .card-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .latest-tag {
-    font-size: 10px;
-    background: var(--accent);
-    color: #fff;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
+  .latest-tag { font-size: 10px; background: var(--accent); color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 600; letter-spacing: 0.5px; }
 
   /* ── Metrics ── */
   .metrics { display: flex; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
   .metric { flex: 1; min-width: 120px; }
   .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
-  .metric-bar {
-    height: 6px;
-    border-radius: 3px;
-    background: var(--surface2);
-    overflow: hidden;
-    margin-bottom: 4px;
-  }
+  .metric-bar { height: 6px; border-radius: 3px; background: var(--surface2); overflow: hidden; margin-bottom: 4px; }
   .metric-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
   .fill-score { background: linear-gradient(90deg, var(--sell), var(--hold), var(--buy)); }
   .fill-confidence { background: var(--accent); }
@@ -210,261 +129,83 @@
   .rationale { margin-bottom: 10px; }
   .rationale-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
   .rationale-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
-  .rationale-list li {
-    font-size: 13px;
-    color: #a0a0c0;
-    padding-left: 14px;
-    position: relative;
-  }
+  .rationale-list li { font-size: 13px; color: #a0a0c0; padding-left: 14px; position: relative; }
   .rationale-list li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); }
   .risk-list li::before { content: '!'; color: var(--sell); }
   .risk-list li { color: rgba(255,82,82,0.8); }
 
   /* ── Headlines ── */
   .headlines { margin-top: 10px; }
-  .headlines summary {
-    font-size: 12px;
-    color: var(--muted);
-    cursor: pointer;
-    user-select: none;
-    padding: 4px 0;
-  }
+  .headlines summary { font-size: 12px; color: var(--muted); cursor: pointer; user-select: none; padding: 4px 0; }
   .headlines summary:hover { color: var(--text); }
-  .headline-item {
-    font-size: 12px;
-    color: #8080b0;
-    padding: 3px 0 3px 12px;
-    border-left: 2px solid var(--border);
-    margin-top: 4px;
-  }
+  .headline-item { font-size: 12px; color: #8080b0; padding: 3px 0 3px 12px; border-left: 2px solid var(--border); margin-top: 4px; }
 
   /* ── Empty ── */
-  .empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
-  }
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
   .empty-icon { font-size: 40px; margin-bottom: 12px; }
   .empty-title { font-size: 16px; margin-bottom: 6px; }
   .empty-sub { font-size: 13px; }
 
-  /* ── Settings Modal ── */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    width: 100%;
-    max-width: 420px;
-    margin: 16px;
-  }
-  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-  .field { margin-bottom: 16px; }
-  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.7px; }
-  .field select, .field input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 9px 12px;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-  .field select:focus, .field input:focus { outline: none; border-color: var(--accent); }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 18px;
-    font-size: 14px;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.25s;
-    pointer-events: none;
-    z-index: 200;
-  }
-  .toast.show { opacity: 1; transform: none; }
-  .toast.ok { border-color: var(--buy); color: var(--buy); }
-  .toast.err { border-color: var(--sell); color: var(--sell); }
+  /* ── Chart Cards ── */
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; }
+  .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .chart-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .chart-subtitle { font-size: 11px; color: var(--muted); }
+  .chart-legend { display: flex; gap: 12px; align-items: center; font-size: 11px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+  canvas.chart-canvas { width: 100%; display: block; border-radius: 8px; background: var(--surface2); }
+  .chart-source { font-size: 10px; color: var(--muted); margin-top: 6px; text-align: right; }
 
   /* ── Tech Badges ── */
   .tech-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-  .tech-badge {
-    font-size: 11px; font-weight: 700; padding: 3px 9px;
-    border-radius: 5px; letter-spacing: 0.4px;
-  }
+  .tech-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 5px; letter-spacing: 0.4px; }
   .tech-bull { background: rgba(0,230,118,0.12); color: var(--buy);  border: 1px solid rgba(0,230,118,0.25); }
   .tech-bear { background: rgba(255,82,82,0.12);  color: var(--sell); border: 1px solid rgba(255,82,82,0.25); }
   .tech-neut { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 
+  /* ── Settings Modal ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 420px; margin: 16px; }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.7px; }
+  .field select, .field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 14px; }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
   /* ── News Cards ── */
   .news-grid { display: flex; flex-direction: column; gap: 14px; }
-  .news-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px;
-    transition: border-color 0.15s;
-  }
+  .news-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; transition: border-color 0.15s; }
   .news-card:hover { border-color: var(--accent); }
   .news-card.latest { border-color: var(--accent); }
-
-  .news-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+  .news-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
   .news-markets { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .market-badge {
-    font-size: 12px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 5px;
-    letter-spacing: 0.5px;
-  }
+  .market-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 5px; letter-spacing: 0.5px; }
   .market-KR { background: rgba(0,100,255,0.15); color: #5599ff; border: 1px solid rgba(0,100,255,0.3); }
   .market-US { background: rgba(255,200,0,0.12); color: #ffcc44; border: 1px solid rgba(255,200,0,0.3); }
-
-  .sentiment-badge {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  .sent-bullish { background: rgba(0,230,118,0.15); color: var(--buy); border: 1px solid rgba(0,230,118,0.3); }
+  .sentiment-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .sent-bullish { background: rgba(0,230,118,0.15); color: var(--buy);  border: 1px solid rgba(0,230,118,0.3); }
   .sent-bearish { background: rgba(255,82,82,0.15); color: var(--sell); border: 1px solid rgba(255,82,82,0.3); }
-  .sent-neutral { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-
+  .sent-neutral  { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
   .news-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 600px) { .news-sections { grid-template-columns: 1fr; } }
-
-  .news-section-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .news-summary {
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
+  .news-section-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .news-summary { font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 10px; }
   .news-points { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-  .news-points li {
-    font-size: 12px;
-    color: #a0a0c0;
-    padding-left: 14px;
-    position: relative;
-    line-height: 1.5;
-  }
+  .news-points li { font-size: 12px; color: #a0a0c0; padding-left: 14px; position: relative; line-height: 1.5; }
   .news-points li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); }
+  .news-source-tag { display: inline-block; font-size: 10px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; margin-left: 6px; }
 
-  .news-source-tag {
-    display: inline-block;
-    font-size: 10px;
-    color: var(--muted);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1px 7px;
-    margin-left: 6px;
-  }
-
-  /* ── News Status Bar ── */
-  .news-status-bar {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-  }
-
-  /* ── Chart Cards ── */
-  .chart-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    margin-bottom: 14px;
-  }
-  .chart-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .chart-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .chart-subtitle {
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .chart-legend {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    font-size: 11px;
-  }
-  .legend-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 4px;
-  }
-  canvas.chart-canvas {
-    width: 100%;
-    display: block;
-    border-radius: 8px;
-    background: var(--surface2);
-  }
-  .chart-source {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 6px;
-    text-align: right;
-  }
+  /* ── Toast ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 14px; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 200; }
+  .toast.show { opacity: 1; transform: none; }
+  .toast.ok  { border-color: var(--buy);  color: var(--buy); }
+  .toast.err { border-color: var(--sell); color: var(--sell); }
 
   /* ── Spinner ── */
   @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner {
-    display: inline-block;
-    width: 14px; height: 14px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-    margin-right: 6px;
-  }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
 </style>
 </head>
 <body>
@@ -472,14 +213,12 @@
 <header>
   <div class="logo">TSUM<span> INTEL</span></div>
 
-  <!-- Mode Toggle -->
   <div class="mode-toggle">
-    <button class="toggle-btn active" id="toggleCrypto" onclick="switchView('crypto')">₿ 비트코인</button>
+    <button class="toggle-btn active" id="toggleCrypto" onclick="switchView('crypto')">₿ 코인</button>
     <button class="toggle-btn" id="toggleNews" onclick="switchView('news')">📰 뉴스</button>
   </div>
 
   <div class="header-right" id="cryptoHeaderRight">
-    <span class="badge-coin" id="headerCoin">BTC</span>
     <button class="btn" onclick="manualTrigger()" id="triggerBtn">지금 분석</button>
     <button class="btn" onclick="openSettings()">설정</button>
   </div>
@@ -491,6 +230,16 @@
 <main>
   <!-- ══ Crypto View ════════════════════════════════════════════════════════ -->
   <div class="view active" id="cryptoView">
+
+    <!-- 코인 탭 -->
+    <div class="coin-tabs">
+      <button class="coin-tab active" id="tab-bitcoin"  onclick="selectCoin('bitcoin')">₿ BTC<span class="coin-change" id="chg-bitcoin"></span></button>
+      <button class="coin-tab"        id="tab-ethereum" onclick="selectCoin('ethereum')">Ξ ETH<span class="coin-change" id="chg-ethereum"></span></button>
+      <button class="coin-tab"        id="tab-solana"   onclick="selectCoin('solana')">◎ SOL<span class="coin-change" id="chg-solana"></span></button>
+      <button class="coin-tab"        id="tab-dogecoin" onclick="selectCoin('dogecoin')">Ð DOGE<span class="coin-change" id="chg-dogecoin"></span></button>
+    </div>
+
+    <!-- 상태바 -->
     <div class="status-bar">
       <div class="stat-box">
         <div class="stat-label">신호 수</div>
@@ -544,12 +293,10 @@
       <div class="chart-source">Source: CoinGecko</div>
     </div>
 
-    <div class="section-title">신호 스택 (최신순)</div>
+    <!-- 신호 목록 -->
+    <div class="section-title" id="signalSectionTitle">신호 스택 (최신순)</div>
     <div class="signal-list" id="signalList">
-      <div class="empty">
-        <div class="empty-icon">📡</div>
-        <div class="empty-title">분석 데이터 로딩 중...</div>
-      </div>
+      <div class="empty"><div class="empty-icon">📡</div><div class="empty-title">로딩 중...</div></div>
     </div>
   </div>
 
@@ -569,16 +316,12 @@
       <div class="stat-box">
         <div class="stat-label">미국 증시</div>
         <div class="stat-value" id="latestUsSentiment">—</div>
-        <div class="stat-sub">S&P500 / NASDAQ</div>
+        <div class="stat-sub">S&amp;P500 / NASDAQ</div>
       </div>
     </div>
-
     <div class="section-title">주식 뉴스 요약 (최신순)</div>
     <div class="news-grid" id="newsList">
-      <div class="empty">
-        <div class="empty-icon">📰</div>
-        <div class="empty-title">뉴스 데이터 로딩 중...</div>
-      </div>
+      <div class="empty"><div class="empty-icon">📰</div><div class="empty-title">로딩 중...</div></div>
     </div>
   </div>
 </main>
@@ -587,15 +330,6 @@
 <div class="modal-overlay" id="settingsModal" onclick="closeSettingsOnOverlay(event)">
   <div class="modal">
     <div class="modal-title">설정</div>
-    <div class="field">
-      <label>분석 코인</label>
-      <select id="setCoin">
-        <option value="bitcoin">Bitcoin (BTC)</option>
-        <option value="ethereum">Ethereum (ETH)</option>
-        <option value="solana">Solana (SOL)</option>
-        <option value="dogecoin">Dogecoin (DOGE)</option>
-      </select>
-    </div>
     <div class="field">
       <label>분석 주기 (시간)</label>
       <input type="number" id="setInterval" min="1" max="168" value="5">
@@ -615,230 +349,17 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
 const COIN_SYMBOLS = { bitcoin:'BTC', ethereum:'ETH', solana:'SOL', dogecoin:'DOGE' };
+const COIN_SYMBOLS_LIQMAP = { bitcoin:'BTC', ethereum:'ETH', solana:'SOL', dogecoin:'DOGE' };
+const COIN_ICONS = { bitcoin:'₿', ethereum:'Ξ', solana:'◎', dogecoin:'Ð' };
+
+let currentView = 'crypto';
+let currentCoin = 'bitcoin';
 let nextRunTs = null;
 let countdownTimer = null;
-let currentView = 'crypto';
-
-// ── Liquidation Map ──────────────────────────────────────────────────────────
-
-async function fetchLiquidation() {
-  try {
-    const r = await fetch('/api/liquidation?symbol=BTC');
-    const d = await r.json();
-    const sourceLabels = {
-      coinglass: 'Coinglass 실시간',
-      estimated: 'Binance OI·펀딩레이트 기반 추정',
-      binance_24h: 'Binance 최근 24h 청산 분포',
-      unavailable: '데이터 없음',
-    };
-    document.getElementById('liqSource').textContent = sourceLabels[d.source] || d.source;
-    document.getElementById('liqNote').textContent = d.note || '';
-    drawLiqMap(d.current_price, d.levels || []);
-  } catch(e) {
-    document.getElementById('liqSource').textContent = '로드 실패';
-  }
-}
-
-function drawLiqMap(currentPrice, levels) {
-  const canvas = document.getElementById('liqCanvas');
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.clientWidth || canvas.parentElement.clientWidth || 820;
-  const H = 220;
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  const PAD = { l: 75, r: 16, t: 16, b: 28 };
-  const cW = W - PAD.l - PAD.r;
-  const cH = H - PAD.t - PAD.b;
-
-  ctx.fillStyle = '#1a1a35';
-  ctx.fillRect(0, 0, W, H);
-
-  if (!levels.length) {
-    ctx.fillStyle = '#7070a0';
-    ctx.font = '13px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('청산 데이터 없음', W / 2, H / 2);
-    return;
-  }
-
-  const prices   = levels.map(l => l.price);
-  const minP     = Math.min(...prices);
-  const maxP     = Math.max(...prices);
-  const pRange   = maxP - minP || 1;
-  const maxVal   = Math.max(...levels.map(l => Math.max(l.long_usd, l.short_usd)));
-  const barH     = Math.max(2, (cH / levels.length) * 0.72);
-  const halfBar  = cW * 0.46;
-
-  // grid lines
-  for (let i = 0; i <= 4; i++) {
-    const y = PAD.t + cH * (i / 4);
-    ctx.strokeStyle = '#2a2a4a';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
-    const p = maxP - pRange * (i / 4);
-    ctx.fillStyle = '#6060a0';
-    ctx.font = '10px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('$' + Math.round(p).toLocaleString(), PAD.l - 5, y + 3);
-  }
-
-  // center divider
-  const midX = PAD.l + cW / 2;
-  ctx.strokeStyle = '#3a3a5a';
-  ctx.setLineDash([3, 3]);
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(midX, PAD.t); ctx.lineTo(midX, PAD.t + cH); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // bars
-  for (const lv of levels) {
-    const y = PAD.t + cH - ((lv.price - minP) / pRange * cH);
-    if (lv.long_usd > 0) {
-      const w = (lv.long_usd / maxVal) * halfBar;
-      ctx.fillStyle = 'rgba(255,82,82,0.65)';
-      ctx.fillRect(midX - w, y - barH / 2, w, barH);
-    }
-    if (lv.short_usd > 0) {
-      const w = (lv.short_usd / maxVal) * halfBar;
-      ctx.fillStyle = 'rgba(0,230,118,0.65)';
-      ctx.fillRect(midX, y - barH / 2, w, barH);
-    }
-  }
-
-  // current price line
-  if (currentPrice && currentPrice >= minP && currentPrice <= maxP) {
-    const y = PAD.t + cH - ((currentPrice - minP) / pRange * cH);
-    ctx.strokeStyle = '#7c6af7';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([5, 4]);
-    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#7c6af7';
-    ctx.font = 'bold 10px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('$' + Math.round(currentPrice).toLocaleString(), PAD.l - 5, y + 3);
-  }
-
-  // axis labels
-  ctx.fillStyle = '#5050a0';
-  ctx.font = '9px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('← 롱 청산', midX - halfBar * 0.5, PAD.t + cH + 18);
-  ctx.fillText('숏 청산 →', midX + halfBar * 0.5, PAD.t + cH + 18);
-}
-
-// ── Bubble Map ────────────────────────────────────────────────────────────────
-
-async function fetchBubbles() {
-  try {
-    const r = await fetch('/api/bubbles');
-    const coins = await r.json();
-    if (coins.length) drawBubbleMap(coins);
-    const maxC = coins[0];
-    if (maxC) {
-      document.getElementById('bubbleLegend').textContent =
-        `BTC 도미넌스 기준 · ${coins.length}개 코인`;
-    }
-  } catch(e) {
-    document.getElementById('bubbleLegend').textContent = '로드 실패';
-  }
-}
-
-function drawBubbleMap(coins) {
-  const canvas = document.getElementById('bubbleCanvas');
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.clientWidth || canvas.parentElement.clientWidth || 820;
-  const H = 300;
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  ctx.fillStyle = '#1a1a35';
-  ctx.fillRect(0, 0, W, H);
-
-  const maxMcap = Math.max(...coins.map(c => c.market_cap));
-  const MAX_R = Math.min(W, H) * 0.18;
-  const MIN_R = 14;
-
-  // Assign radii
-  const bubbles = coins.slice(0, 20).map(c => ({
-    ...c,
-    r: MIN_R + Math.sqrt(c.market_cap / maxMcap) * (MAX_R - MIN_R),
-  })).sort((a, b) => b.r - a.r);
-
-  // Place bubbles with simple spiral packing
-  const placed = [];
-  for (const b of bubbles) {
-    let bestX = W / 2, bestY = H / 2, found = false;
-    const STEP = 0.35;
-    let angle = 0, radius = 0;
-    while (radius < W + H) {
-      const tx = W / 2 + radius * Math.cos(angle);
-      const ty = H / 2 + radius * Math.sin(angle);
-      if (tx - b.r >= 4 && tx + b.r <= W - 4 && ty - b.r >= 4 && ty + b.r <= H - 4) {
-        let ok = true;
-        for (const p of placed) {
-          const dx = tx - p.x, dy = ty - p.y;
-          if (Math.sqrt(dx * dx + dy * dy) < p.r + b.r + 3) { ok = false; break; }
-        }
-        if (ok) { bestX = tx; bestY = ty; found = true; break; }
-      }
-      angle += STEP;
-      radius += STEP * 0.28;
-    }
-    b.x = bestX; b.y = bestY;
-    placed.push(b);
-  }
-
-  // Draw bubbles
-  for (const b of placed) {
-    const ch = b.change_24h || 0;
-    const intensity = Math.min(1, Math.abs(ch) / 8);
-    const alpha = 0.25 + intensity * 0.5;
-
-    // Fill
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-    if (ch >= 0) {
-      ctx.fillStyle = `rgba(0,230,118,${alpha})`;
-      ctx.strokeStyle = `rgba(0,230,118,${0.4 + intensity * 0.5})`;
-    } else {
-      ctx.fillStyle = `rgba(255,82,82,${alpha})`;
-      ctx.strokeStyle = `rgba(255,82,82,${0.4 + intensity * 0.5})`;
-    }
-    ctx.fill();
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Label
-    if (b.r > 18) {
-      ctx.fillStyle = '#e2e2f0';
-      const fs = Math.min(13, Math.max(9, b.r * 0.32));
-      ctx.font = `bold ${fs}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const hasChange = b.r > 26;
-      ctx.fillText(b.symbol, b.x, hasChange ? b.y - fs * 0.6 : b.y);
-      if (hasChange) {
-        const changeFontSize = Math.min(10, Math.max(8, b.r * 0.22));
-        ctx.font = `${changeFontSize}px sans-serif`;
-        ctx.fillStyle = ch >= 0 ? '#00e676' : '#ff5252';
-        ctx.fillText(`${ch >= 0 ? '+' : ''}${ch.toFixed(1)}%`, b.x, b.y + fs * 0.7);
-      }
-    }
-  }
-}
 
 // ── View Toggle ──────────────────────────────────────────────────────────────
 
@@ -849,40 +370,67 @@ function switchView(view) {
   document.getElementById('toggleCrypto').classList.toggle('active', view === 'crypto');
   document.getElementById('toggleNews').classList.toggle('active', view === 'news');
   document.getElementById('cryptoHeaderRight').style.display = view === 'crypto' ? 'flex' : 'none';
-  document.getElementById('newsHeaderRight').style.display = view === 'news' ? 'flex' : 'none';
+  document.getElementById('newsHeaderRight').style.display  = view === 'news'   ? 'flex' : 'none';
   if (view === 'news') fetchNews();
 }
 
-// ── Crypto: Fetch & Render ───────────────────────────────────────────────────
+// ── Coin Tabs ────────────────────────────────────────────────────────────────
+
+function selectCoin(coin) {
+  currentCoin = coin;
+  document.querySelectorAll('.coin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${coin}`).classList.add('active');
+  document.getElementById('signalSectionTitle').textContent =
+    `${COIN_ICONS[coin]} ${COIN_SYMBOLS[coin]} 신호 스택 (최신순)`;
+  refreshCrypto();
+  fetchLiquidation();
+}
+
+// ── Crypto Status & Signals ──────────────────────────────────────────────────
 
 async function fetchStatus() {
   try {
-    const r = await fetch('/api/status');
+    const r = await fetch(`/api/status?coin=${currentCoin}`);
     const d = await r.json();
     document.getElementById('signalCount').textContent = `${d.signal_count} / ${d.max_stack}`;
     document.getElementById('intervalDisplay').textContent = `${d.settings.interval_hours}h`;
-    const coin = d.settings.coin || 'bitcoin';
-    document.getElementById('coinDisplay').textContent = coin.charAt(0).toUpperCase() + coin.slice(1);
-    document.getElementById('headerCoin').textContent = COIN_SYMBOLS[coin] || coin.toUpperCase();
+    document.getElementById('coinDisplay').textContent =
+      currentCoin.charAt(0).toUpperCase() + currentCoin.slice(1);
     if (d.next_run) nextRunTs = new Date(d.next_run).getTime();
+
+    if (d.latest_action) {
+      document.getElementById('latestAction').textContent = d.latest_action;
+      document.getElementById('latestAction').style.color =
+        d.latest_action === 'BUY' ? 'var(--buy)' : d.latest_action === 'SELL' ? 'var(--sell)' : 'var(--hold)';
+      document.getElementById('latestScore').textContent =
+        d.latest_score != null ? `score ${d.latest_score.toFixed(3)}` : '—';
+    } else {
+      document.getElementById('latestAction').textContent = '—';
+      document.getElementById('latestAction').style.color = '';
+      document.getElementById('latestScore').textContent = 'score —';
+    }
   } catch(e) { /* ignore */ }
 }
 
 async function fetchSignals() {
   try {
-    const r = await fetch('/api/signals');
+    const r = await fetch(`/api/signals?coin=${currentCoin}`);
     const signals = await r.json();
     renderSignals(signals);
+    // 탭에 최신 가격 변동 표시
     if (signals.length > 0) {
-      const s = signals[0];
-      const act = s.signal?.action || '—';
-      const score = s.signal?.score;
-      document.getElementById('latestAction').textContent = act;
-      document.getElementById('latestAction').style.color = act === 'BUY' ? 'var(--buy)' : act === 'SELL' ? 'var(--sell)' : 'var(--hold)';
-      document.getElementById('latestScore').textContent = score != null ? `score ${score.toFixed(3)}` : '—';
+      const chg = signals[0].price_change_24h;
+      if (chg != null) {
+        const el = document.getElementById(`chg-${currentCoin}`);
+        if (el) {
+          el.textContent = ` ${chg >= 0 ? '+' : ''}${chg.toFixed(1)}%`;
+          el.style.color = chg >= 0 ? 'var(--buy)' : 'var(--sell)';
+        }
+      }
     }
   } catch(e) {
-    document.getElementById('signalList').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">데이터를 불러올 수 없습니다</div></div>';
+    document.getElementById('signalList').innerHTML =
+      '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">데이터를 불러올 수 없습니다</div></div>';
   }
 }
 
@@ -891,66 +439,37 @@ function renderSignals(signals) {
   if (!signals || signals.length === 0) {
     el.innerHTML = `<div class="empty">
       <div class="empty-icon">📡</div>
-      <div class="empty-title">아직 분석 결과가 없습니다</div>
-      <div class="empty-sub">"지금 분석" 버튼을 눌러 첫 분석을 실행하세요</div>
+      <div class="empty-title">분석 결과가 없습니다</div>
+      <div class="empty-sub">"지금 분석" 버튼을 눌러 시작하세요</div>
     </div>`;
     return;
   }
-  el.innerHTML = signals.map((s, i) => renderCard(s, i === 0)).join('');
+  // 최대 5개만 표시
+  el.innerHTML = signals.slice(0, 5).map((s, i) => renderCard(s, i === 0)).join('');
 }
 
 function renderCard(s, isLatest) {
   const sig = s.signal || {};
   const action = sig.action || 'HOLD';
-  const score = sig.score ?? 0.5;
-  const conf = sig.confidence ?? 0;
+  const score  = sig.score ?? 0.5;
+  const conf   = sig.confidence ?? 0;
   const rationale = sig.rationale || [];
-  const risks = sig.risk_flags || [];
-  const coin = s.coin || 'bitcoin';
+  const risks  = sig.risk_flags || [];
+  const coin   = s.coin || 'bitcoin';
   const summary = s.summary || {};
   const headlines = summary.top_headlines || [];
-  const price = s.price_usd;
+  const price  = s.price_usd;
   const change = s.price_change_24h;
-  const ts = s.generated_at ? new Date(s.generated_at) : null;
-  const timeStr = ts ? ts.toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+  const ts     = s.generated_at ? new Date(s.generated_at) : null;
+  const timeStr = ts ? ts.toLocaleString('ko-KR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+  const tech   = (summary.technical || {}).components || {};
 
-  const scoreBarPct = (score * 100).toFixed(1);
-  const confPct = (conf * 100).toFixed(1);
-  const tech = summary.technical || {};
-  const techComponents = tech.components || {};
-
-  const priceHtml = price != null ? `
-    <div class="price-row">
-      <span class="price-val">$${Number(price).toLocaleString()}</span>
-      ${change != null ? `<span class="price-change ${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : ''}${Number(change).toFixed(2)}%</span>` : ''}
-    </div>` : '';
-
-  const techBadges = Object.entries({
-    RSI:    techComponents.rsi     != null ? _techBadge('RSI',    techComponents.rsi)    : null,
-    MACD:   techComponents.macd    != null ? _techBadge('MACD',   techComponents.macd)   : null,
-    BB:     techComponents.bb      != null ? _techBadge('BB',     techComponents.bb)     : null,
-    '거래량': techComponents.volume != null ? _techBadge('거래량', techComponents.volume) : null,
-  }).filter(([,v]) => v).map(([,v]) => v).join('');
-
-  const techHtml = techBadges ? `<div class="tech-badges">${techBadges}</div>` : '';
-
-  const rationaleHtml = rationale.length ? `
-    <div class="rationale">
-      <div class="rationale-title">근거</div>
-      <ul class="rationale-list">${rationale.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
-    </div>` : '';
-
-  const riskHtml = risks.length ? `
-    <div class="rationale">
-      <div class="rationale-title">리스크</div>
-      <ul class="rationale-list risk-list">${risks.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
-    </div>` : '';
-
-  const headlinesHtml = headlines.length ? `
-    <details class="headlines">
-      <summary>주요 헤드라인 ${headlines.length}개 보기</summary>
-      ${headlines.map(h => `<div class="headline-item">${esc(h)}</div>`).join('')}
-    </details>` : '';
+  const techBadges = [
+    tech.rsi    != null ? _techBadge('RSI',    tech.rsi)    : null,
+    tech.macd   != null ? _techBadge('MACD',   tech.macd)   : null,
+    tech.bb     != null ? _techBadge('BB',     tech.bb)     : null,
+    tech.volume != null ? _techBadge('거래량', tech.volume) : null,
+  ].filter(Boolean).join('');
 
   return `
   <div class="card${isLatest ? ' latest' : ''}">
@@ -962,114 +481,186 @@ function renderCard(s, isLatest) {
       </div>
       <span class="card-time">${timeStr}</span>
     </div>
-    ${priceHtml}
-    ${techHtml}
+    ${price != null ? `<div class="price-row">
+      <span class="price-val">$${Number(price).toLocaleString()}</span>
+      ${change != null ? `<span class="price-change ${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : ''}${Number(change).toFixed(2)}%</span>` : ''}
+    </div>` : ''}
+    ${techBadges ? `<div class="tech-badges">${techBadges}</div>` : ''}
     <div class="metrics">
       <div class="metric">
         <div class="metric-label">종합 점수</div>
-        <div class="metric-bar"><div class="metric-fill fill-score" style="width:${scoreBarPct}%"></div></div>
+        <div class="metric-bar"><div class="metric-fill fill-score" style="width:${(score*100).toFixed(1)}%"></div></div>
         <div class="metric-val">${score.toFixed(3)}</div>
       </div>
       <div class="metric">
         <div class="metric-label">신뢰도</div>
-        <div class="metric-bar"><div class="metric-fill fill-confidence" style="width:${confPct}%"></div></div>
-        <div class="metric-val">${(conf * 100).toFixed(0)}%</div>
+        <div class="metric-bar"><div class="metric-fill fill-confidence" style="width:${(conf*100).toFixed(1)}%"></div></div>
+        <div class="metric-val">${(conf*100).toFixed(0)}%</div>
       </div>
     </div>
-    ${rationaleHtml}
-    ${riskHtml}
-    ${headlinesHtml}
+    ${rationale.length ? `<div class="rationale"><div class="rationale-title">근거</div><ul class="rationale-list">${rationale.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>` : ''}
+    ${risks.length ? `<div class="rationale"><div class="rationale-title">리스크</div><ul class="rationale-list risk-list">${risks.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>` : ''}
+    ${headlines.length ? `<details class="headlines"><summary>주요 헤드라인 ${headlines.length}개 보기</summary>${headlines.map(h=>`<div class="headline-item">${esc(h)}</div>`).join('')}</details>` : ''}
   </div>`;
 }
 
 function _techBadge(label, score) {
-  const cls = score >= 0.60 ? 'bull' : score <= 0.40 ? 'bear' : 'neut';
+  const cls  = score >= 0.60 ? 'bull' : score <= 0.40 ? 'bear' : 'neut';
   const icon = score >= 0.60 ? '▲' : score <= 0.40 ? '▼' : '—';
   return `<span class="tech-badge tech-${cls}">${icon} ${label}</span>`;
 }
 
-// ── News: Fetch & Render ─────────────────────────────────────────────────────
+// ── Liquidation Map ──────────────────────────────────────────────────────────
 
-async function fetchNews() {
+async function fetchLiquidation() {
+  const sym = COIN_SYMBOLS_LIQMAP[currentCoin] || 'BTC';
   try {
-    const r = await fetch('/api/news');
-    const newsList = await r.json();
-    renderNews(newsList);
-    document.getElementById('newsCount').textContent = `${newsList.length} / 5`;
-    if (newsList.length > 0) {
-      const latest = newsList[0];
-      document.getElementById('latestKrSentiment').textContent = sentimentLabel(latest.kr_sentiment);
-      document.getElementById('latestKrSentiment').style.color = sentimentColor(latest.kr_sentiment);
-      document.getElementById('latestUsSentiment').textContent = sentimentLabel(latest.us_sentiment);
-      document.getElementById('latestUsSentiment').style.color = sentimentColor(latest.us_sentiment);
+    const r = await fetch(`/api/liquidation?symbol=${sym}`);
+    const d = await r.json();
+    const srcLabel = { coinglass:'Coinglass 실시간', estimated:'Binance OI·펀딩레이트 기반 추정', unavailable:'데이터 없음' };
+    document.getElementById('liqSource').textContent = srcLabel[d.source] || d.source;
+    document.getElementById('liqNote').textContent = d.note || '';
+    drawLiqMap(d.current_price, d.levels || []);
+  } catch(e) { document.getElementById('liqSource').textContent = '로드 실패'; }
+}
+
+function drawLiqMap(currentPrice, levels) {
+  const canvas = document.getElementById('liqCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 820;
+  const H = 220;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const PAD = { l:75, r:16, t:16, b:28 };
+  const cW = W - PAD.l - PAD.r, cH = H - PAD.t - PAD.b;
+  ctx.fillStyle = '#1a1a35'; ctx.fillRect(0, 0, W, H);
+
+  if (!levels.length) {
+    ctx.fillStyle = '#7070a0'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('청산 데이터 없음', W/2, H/2); return;
+  }
+  const prices = levels.map(l => l.price);
+  const minP = Math.min(...prices), maxP = Math.max(...prices), pRange = maxP - minP || 1;
+  const maxVal = Math.max(...levels.map(l => Math.max(l.long_usd, l.short_usd)));
+  const barH = Math.max(2, cH / levels.length * 0.72);
+  const half = cW * 0.46;
+
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD.t + cH * (i/4);
+    ctx.strokeStyle = '#2a2a4a'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l+cW, y); ctx.stroke();
+    const p = maxP - pRange * (i/4);
+    ctx.fillStyle = '#6060a0'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText('$'+Math.round(p).toLocaleString(), PAD.l-5, y+3);
+  }
+  const midX = PAD.l + cW/2;
+  ctx.strokeStyle = '#3a3a5a'; ctx.setLineDash([3,3]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(midX, PAD.t); ctx.lineTo(midX, PAD.t+cH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  for (const lv of levels) {
+    const y = PAD.t + cH - ((lv.price - minP) / pRange * cH);
+    if (lv.long_usd > 0) {
+      const w = (lv.long_usd / maxVal) * half;
+      ctx.fillStyle = 'rgba(255,82,82,0.65)';
+      ctx.fillRect(midX - w, y - barH/2, w, barH);
     }
-  } catch(e) {
-    document.getElementById('newsList').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">뉴스를 불러올 수 없습니다</div></div>';
+    if (lv.short_usd > 0) {
+      const w = (lv.short_usd / maxVal) * half;
+      ctx.fillStyle = 'rgba(0,230,118,0.65)';
+      ctx.fillRect(midX, y - barH/2, w, barH);
+    }
   }
-}
-
-function renderNews(list) {
-  const el = document.getElementById('newsList');
-  if (!list || list.length === 0) {
-    el.innerHTML = `<div class="empty">
-      <div class="empty-icon">📰</div>
-      <div class="empty-title">아직 뉴스 요약이 없습니다</div>
-      <div class="empty-sub">"뉴스 새로고침" 버튼을 눌러 분석을 시작하세요</div>
-    </div>`;
-    return;
+  if (currentPrice && currentPrice >= minP && currentPrice <= maxP) {
+    const y = PAD.t + cH - ((currentPrice - minP) / pRange * cH);
+    ctx.strokeStyle = '#7c6af7'; ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l+cW, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#7c6af7'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText('$'+Math.round(currentPrice).toLocaleString(), PAD.l-5, y+3);
   }
-  el.innerHTML = list.map((item, i) => renderNewsCard(item, i === 0)).join('');
+  ctx.fillStyle = '#5050a0'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('← 롱 청산', midX - half*0.5, PAD.t+cH+18);
+  ctx.fillText('숏 청산 →', midX + half*0.5, PAD.t+cH+18);
 }
 
-function renderNewsCard(item, isLatest) {
-  const ts = item.generated_at ? new Date(item.generated_at) : null;
-  const timeStr = ts ? ts.toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
-  const krSent = item.kr_sentiment || 'neutral';
-  const usSent = item.us_sentiment || 'neutral';
-  const krPoints = item.kr_points || [];
-  const usPoints = item.us_points || [];
-  const source = item.source || '';
+// ── Bubble Map ────────────────────────────────────────────────────────────────
 
-  const krPointsHtml = krPoints.length
-    ? `<ul class="news-points">${krPoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
-  const usPointsHtml = usPoints.length
-    ? `<ul class="news-points">${usPoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : '';
-
-  return `
-  <div class="news-card${isLatest ? ' latest' : ''}">
-    <div class="news-card-header">
-      <div class="news-markets">
-        <span class="market-badge market-KR">🇰🇷 KR</span>
-        <span class="sentiment-badge sent-${krSent}">${sentimentLabel(krSent)}</span>
-        <span style="margin: 0 4px; color: var(--border)">|</span>
-        <span class="market-badge market-US">🇺🇸 US</span>
-        <span class="sentiment-badge sent-${usSent}">${sentimentLabel(usSent)}</span>
-        ${isLatest ? '<span class="latest-tag">LATEST</span>' : ''}
-        ${source === 'tavily+openai' ? '<span class="news-source-tag">AI 요약</span>' : source === 'fallback' ? '<span class="news-source-tag">오류</span>' : ''}
-      </div>
-      <span class="card-time">${timeStr}</span>
-    </div>
-    <div class="news-sections">
-      <div>
-        <div class="news-section-title">🇰🇷 한국 증시</div>
-        <div class="news-summary">${esc(item.kr_summary || '')}</div>
-        ${krPointsHtml}
-      </div>
-      <div>
-        <div class="news-section-title">🇺🇸 미국 증시</div>
-        <div class="news-summary">${esc(item.us_summary || '')}</div>
-        ${usPointsHtml}
-      </div>
-    </div>
-  </div>`;
+async function fetchBubbles() {
+  try {
+    const r = await fetch('/api/bubbles');
+    const coins = await r.json();
+    if (coins.length) drawBubbleMap(coins);
+    document.getElementById('bubbleLegend').textContent = `${coins.length}개 코인`;
+  } catch(e) { document.getElementById('bubbleLegend').textContent = '로드 실패'; }
 }
 
-function sentimentLabel(s) {
-  return s === 'bullish' ? '강세' : s === 'bearish' ? '약세' : '중립';
-}
+function drawBubbleMap(coins) {
+  const canvas = document.getElementById('bubbleCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 820;
+  const H = 300;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.fillStyle = '#1a1a35'; ctx.fillRect(0, 0, W, H);
 
-function sentimentColor(s) {
-  return s === 'bullish' ? 'var(--buy)' : s === 'bearish' ? 'var(--sell)' : 'var(--hold)';
+  const maxMcap = Math.max(...coins.map(c => c.market_cap));
+  const MAX_R = Math.min(W, H) * 0.18, MIN_R = 14;
+  const bubbles = coins.slice(0, 20).map(c => ({
+    ...c, r: MIN_R + Math.sqrt(c.market_cap / maxMcap) * (MAX_R - MIN_R),
+  })).sort((a,b) => b.r - a.r);
+
+  const placed = [];
+  for (const b of bubbles) {
+    let bx = W/2, by = H/2;
+    const STEP = 0.35;
+    let angle = 0, radius = 0;
+    while (radius < W + H) {
+      const tx = W/2 + radius * Math.cos(angle);
+      const ty = H/2 + radius * Math.sin(angle);
+      if (tx-b.r>=4 && tx+b.r<=W-4 && ty-b.r>=4 && ty+b.r<=H-4) {
+        let ok = true;
+        for (const p of placed) {
+          const dx=tx-p.x, dy=ty-p.y;
+          if (Math.sqrt(dx*dx+dy*dy) < p.r+b.r+3) { ok=false; break; }
+        }
+        if (ok) { bx=tx; by=ty; break; }
+      }
+      angle += STEP; radius += STEP * 0.28;
+    }
+    b.x = bx; b.y = by; placed.push(b);
+  }
+
+  for (const b of placed) {
+    const ch = b.change_24h || 0;
+    const intensity = Math.min(1, Math.abs(ch)/8);
+    const alpha = 0.25 + intensity * 0.5;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    if (ch >= 0) {
+      ctx.fillStyle = `rgba(0,230,118,${alpha})`; ctx.strokeStyle = `rgba(0,230,118,${0.4+intensity*0.5})`;
+    } else {
+      ctx.fillStyle = `rgba(255,82,82,${alpha})`;  ctx.strokeStyle = `rgba(255,82,82,${0.4+intensity*0.5})`;
+    }
+    ctx.fill(); ctx.lineWidth = 1.5; ctx.stroke();
+
+    if (b.r > 18) {
+      const fs = Math.min(13, Math.max(9, b.r*0.32));
+      ctx.fillStyle = '#e2e2f0'; ctx.font = `bold ${fs}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const hasChg = b.r > 26;
+      ctx.fillText(b.symbol, b.x, hasChg ? b.y - fs*0.6 : b.y);
+      if (hasChg) {
+        const cfs = Math.min(10, Math.max(8, b.r*0.22));
+        ctx.font = `${cfs}px sans-serif`;
+        ctx.fillStyle = ch >= 0 ? '#00e676' : '#ff5252';
+        ctx.fillText(`${ch>=0?'+':''}${ch.toFixed(1)}%`, b.x, b.y + fs*0.7);
+      }
+    }
+  }
 }
 
 // ── Countdown ────────────────────────────────────────────────────────────────
@@ -1080,16 +671,12 @@ function startCountdown() {
     if (!nextRunTs) { document.getElementById('countdown').textContent = '—'; return; }
     const diff = nextRunTs - Date.now();
     if (diff <= 0) { document.getElementById('countdown').textContent = '곧 시작...'; return; }
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const sc = Math.floor((diff % 60000) / 1000);
+    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
     document.getElementById('countdown').textContent =
-      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;
-    if (nextRunTs) {
-      const d = new Date(nextRunTs);
-      document.getElementById('nextRunTime').textContent =
-        d.toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-    }
+      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const d = new Date(nextRunTs);
+    document.getElementById('nextRunTime').textContent =
+      d.toLocaleString('ko-KR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
   }, 1000);
 }
 
@@ -1100,20 +687,19 @@ async function manualTrigger() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>분석 중...';
   try {
-    const r = await fetch('/api/trigger', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+    const r = await fetch('/api/trigger', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({coin: currentCoin}),
+    });
     const d = await r.json();
     if (d.ok) {
-      showToast(`${d.action} (score: ${d.score?.toFixed(3)})`, 'ok');
+      showToast(`${COIN_SYMBOLS[currentCoin]} ${d.action} (score: ${d.score?.toFixed(3)})`, 'ok');
       await refreshCrypto();
     } else {
       showToast(d.detail || '오류 발생', 'err');
     }
-  } catch(e) {
-    showToast('분석 요청 실패', 'err');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '지금 분석';
-  }
+  } catch(e) { showToast('분석 요청 실패', 'err'); }
+  finally { btn.disabled = false; btn.textContent = '지금 분석'; }
 }
 
 async function manualNewsTrigger() {
@@ -1121,20 +707,14 @@ async function manualNewsTrigger() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>분석 중...';
   try {
-    const r = await fetch('/api/news/trigger', { method:'POST', headers:{'Content-Type':'application/json'} });
+    const r = await fetch('/api/news/trigger', {method:'POST', headers:{'Content-Type':'application/json'}});
     const d = await r.json();
     if (d.ok) {
       showToast(`KR: ${sentimentLabel(d.kr_sentiment)} / US: ${sentimentLabel(d.us_sentiment)}`, 'ok');
       await fetchNews();
-    } else {
-      showToast(d.detail || '오류 발생', 'err');
-    }
-  } catch(e) {
-    showToast('뉴스 요청 실패', 'err');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '뉴스 새로고침';
-  }
+    } else { showToast(d.detail || '오류 발생', 'err'); }
+  } catch(e) { showToast('뉴스 요청 실패', 'err'); }
+  finally { btn.disabled = false; btn.textContent = '뉴스 새로고침'; }
 }
 
 async function refreshCrypto() {
@@ -1145,59 +725,114 @@ async function refreshCharts() {
   await Promise.all([fetchLiquidation(), fetchBubbles()]);
 }
 
+// ── News ─────────────────────────────────────────────────────────────────────
+
+async function fetchNews() {
+  try {
+    const r = await fetch('/api/news');
+    const list = await r.json();
+    // 최대 5개만 표시
+    renderNews(list.slice(0, 5));
+    document.getElementById('newsCount').textContent = `${Math.min(list.length, 5)} / 5`;
+    if (list.length > 0) {
+      document.getElementById('latestKrSentiment').textContent = sentimentLabel(list[0].kr_sentiment);
+      document.getElementById('latestKrSentiment').style.color = sentimentColor(list[0].kr_sentiment);
+      document.getElementById('latestUsSentiment').textContent = sentimentLabel(list[0].us_sentiment);
+      document.getElementById('latestUsSentiment').style.color = sentimentColor(list[0].us_sentiment);
+    }
+  } catch(e) {
+    document.getElementById('newsList').innerHTML =
+      '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">뉴스를 불러올 수 없습니다</div></div>';
+  }
+}
+
+function renderNews(list) {
+  const el = document.getElementById('newsList');
+  if (!list || list.length === 0) {
+    el.innerHTML = `<div class="empty">
+      <div class="empty-icon">📰</div>
+      <div class="empty-title">아직 뉴스 요약이 없습니다</div>
+      <div class="empty-sub">"뉴스 새로고침" 버튼을 눌러 시작하세요</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = list.map((item, i) => renderNewsCard(item, i === 0)).join('');
+}
+
+function renderNewsCard(item, isLatest) {
+  const ts = item.generated_at ? new Date(item.generated_at) : null;
+  const timeStr = ts ? ts.toLocaleString('ko-KR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+  const kr = item.kr_sentiment || 'neutral', us = item.us_sentiment || 'neutral';
+  const krPts = (item.kr_points||[]).map(p=>`<li>${esc(p)}</li>`).join('');
+  const usPts = (item.us_points||[]).map(p=>`<li>${esc(p)}</li>`).join('');
+  const src = item.source === 'tavily+openai' ? 'AI 요약' : item.source === 'fallback' ? '오류' : '';
+  return `
+  <div class="news-card${isLatest?' latest':''}">
+    <div class="news-card-header">
+      <div class="news-markets">
+        <span class="market-badge market-KR">🇰🇷 KR</span>
+        <span class="sentiment-badge sent-${kr}">${sentimentLabel(kr)}</span>
+        <span style="margin:0 4px;color:var(--border)">|</span>
+        <span class="market-badge market-US">🇺🇸 US</span>
+        <span class="sentiment-badge sent-${us}">${sentimentLabel(us)}</span>
+        ${isLatest ? '<span class="latest-tag">LATEST</span>' : ''}
+        ${src ? `<span class="news-source-tag">${src}</span>` : ''}
+      </div>
+      <span class="card-time">${timeStr}</span>
+    </div>
+    <div class="news-sections">
+      <div>
+        <div class="news-section-title">🇰🇷 한국 증시</div>
+        <div class="news-summary">${esc(item.kr_summary||'')}</div>
+        ${krPts ? `<ul class="news-points">${krPts}</ul>` : ''}
+      </div>
+      <div>
+        <div class="news-section-title">🇺🇸 미국 증시</div>
+        <div class="news-summary">${esc(item.us_summary||'')}</div>
+        ${usPts ? `<ul class="news-points">${usPts}</ul>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function sentimentLabel(s) { return s==='bullish'?'강세':s==='bearish'?'약세':'중립'; }
+function sentimentColor(s)  { return s==='bullish'?'var(--buy)':s==='bearish'?'var(--sell)':'var(--hold)'; }
+
 // ── Settings Modal ───────────────────────────────────────────────────────────
 
 function openSettings() {
   fetch('/api/settings').then(r=>r.json()).then(cfg => {
-    document.getElementById('setCoin').value = cfg.coin || 'bitcoin';
-    document.getElementById('setInterval').value = cfg.interval_hours || 5;
-    document.getElementById('setWhaleUsd').value = cfg.min_whale_usd || 1000000;
-    document.getElementById('setLookback').value = cfg.lookback_hours || 24;
+    document.getElementById('setInterval').value  = cfg.interval_hours || 5;
+    document.getElementById('setWhaleUsd').value  = cfg.min_whale_usd  || 1000000;
+    document.getElementById('setLookback').value  = cfg.lookback_hours || 24;
     document.getElementById('settingsModal').classList.add('open');
   });
 }
-
-function closeSettings() {
-  document.getElementById('settingsModal').classList.remove('open');
-}
-
-function closeSettingsOnOverlay(e) {
-  if (e.target === document.getElementById('settingsModal')) closeSettings();
-}
+function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+function closeSettingsOnOverlay(e) { if (e.target===document.getElementById('settingsModal')) closeSettings(); }
 
 async function saveSettings() {
   const body = {
-    coin: document.getElementById('setCoin').value,
     interval_hours: parseInt(document.getElementById('setInterval').value),
-    min_whale_usd: parseInt(document.getElementById('setWhaleUsd').value),
+    min_whale_usd:  parseInt(document.getElementById('setWhaleUsd').value),
     lookback_hours: parseInt(document.getElementById('setLookback').value),
   };
   try {
-    const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const r = await fetch('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
     const d = await r.json();
-    if (d.ok) {
-      showToast('설정 저장 완료', 'ok');
-      closeSettings();
-      await refreshCrypto();
-    } else {
-      showToast(d.detail || '저장 실패', 'err');
-    }
-  } catch(e) {
-    showToast('저장 중 오류 발생', 'err');
-  }
+    if (d.ok) { showToast('설정 저장 완료', 'ok'); closeSettings(); await refreshCrypto(); }
+    else showToast(d.detail || '저장 실패', 'err');
+  } catch(e) { showToast('저장 중 오류 발생', 'err'); }
 }
 
-// ── Toast ────────────────────────────────────────────────────────────────────
+// ── Toast & Utils ────────────────────────────────────────────────────────────
 
-function esc(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 let toastTimer = null;
-function showToast(msg, type = 'ok') {
+function showToast(msg, type='ok') {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast show ${type}`;
+  el.textContent = msg; el.className = `toast show ${type}`;
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.className = 'toast'; }, 3500);
 }
@@ -1209,10 +844,8 @@ async function init() {
   startCountdown();
   refreshCharts();
   setInterval(refreshCrypto, 60_000);
-  // 차트는 5분마다 갱신
   setInterval(refreshCharts, 5 * 60_000);
-  // 캔버스 크기 재조정
-  window.addEventListener('resize', refreshCharts);
+  window.addEventListener('resize', () => { fetchLiquidation(); fetchBubbles(); });
 }
 
 init();
