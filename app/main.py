@@ -113,6 +113,20 @@ async def get_settings():
     return load_settings()
 
 
+# ── Market Viz API ───────────────────────────────────────────────────────────
+
+@app.get("/api/liquidation")
+async def get_liquidation(symbol: str = "BTC"):
+    from tools.market_viz import fetch_liquidation_map
+    return fetch_liquidation_map(symbol.upper())
+
+
+@app.get("/api/bubbles")
+async def get_bubbles():
+    from tools.market_viz import fetch_bubble_coins
+    return fetch_bubble_coins()
+
+
 # ── News API ──────────────────────────────────────────────────────────────────
 
 @app.get("/api/news")
