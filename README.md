@@ -48,7 +48,7 @@ TSUM은 **암호화폐 인텔리전스 에이전트**다.
 |--------|--------|-------------|
 | 기술적 지표 (RSI · MACD · 볼린저밴드) | 30% | Binance Public API |
 | 공포탐욕지수 | 20% | alternative.me |
-| 감성 분석 (뉴스 · SNS) | 20% | CryptoPanic · Reddit · CryptoBERT/Llama-3 |
+| 감성 분석 (뉴스 · SNS) | 20% | CryptoPanic · Reddit · **Qwen2.5-14B unsloth** |
 | 거래소 유입/유출 | 15% | CoinGecko |
 | DeFi TVL | 10% | DeFiLlama |
 | 고래 거래 | 5% | Whale Alert |
@@ -93,8 +93,8 @@ TSUM은 **암호화폐 인텔리전스 에이전트**다.
 │         │                                            │
 │  ┌──────▼──────────┐  ┌───────────────────────────┐ │
 │  │  Sentiment Model│  │  News Analyzer            │ │
-│  │  CryptoBERT LoRA│  │  OpenAI + Tavily          │ │
-│  │  Llama-3 QLoRA  │  └───────────────────────────┘ │
+│  │  Qwen2.5-14B    │  │  OpenAI + Tavily          │ │
+│  │  unsloth LoRA   │  └───────────────────────────┘ │
 │  └─────────────────┘                                 │
 └──────────────────────────┬──────────────────────────┘
                            │
@@ -137,8 +137,8 @@ tsum/
 │
 ├── static/                     # 프론트엔드 (Vanilla JS)
 │
-├── finetune_llama3.ipynb       # 🦙 Llama-3-8B QLoRA 파인튜닝 (W&B 연동)
-├── finetune_cryptobert.ipynb   # 🤖 CryptoBERT LoRA 파인튜닝 (W&B 연동)
+├── finetune_llama3.ipynb       # 🦙 Qwen2.5-14B unsloth 파인튜닝 HF Hub 데이터 (W&B 연동)
+├── finetune_cryptobert.ipynb   # 🤖 Qwen2.5-14B unsloth 파인튜닝 커스텀 데이터 (W&B 연동)
 │
 ├── config.yaml                 # 모델 경로 · 시그널 가중치 설정
 ├── requirements.txt            # Python 의존성
@@ -208,21 +208,22 @@ uvicorn app.main:app --reload --port 8000
 | 모델 | Macro F1 | 비고 |
 |------|----------|------|
 | 룰 기반 (키워드 사전) | 0.41 | 모델 없을 때 자동 fallback |
-| CryptoBERT + LoRA | 0.68 | `finetune_cryptobert.ipynb` 결과물 |
-| **Llama-3-8B + QLoRA** | **0.74 (목표)** | `finetune_llama3.ipynb` 결과물 |
+| CryptoBERT + LoRA | 0.68 | 구형 (더 이상 사용 안 함) |
+| Llama-3-8B + QLoRA | 0.74 | 구형 (더 이상 사용 안 함) |
+| **Qwen2.5-14B + unsloth** | **0.76+ (목표)** | `finetune_llama3.ipynb` / `finetune_cryptobert.ipynb` |
 
 ### 파인튜닝 모델 적용 방법
 
 ```bash
-# 1. Colab에서 노트북 실행 후 zip 다운로드
+# 1. Kaggle 2xT4에서 노트북 실행 후 zip 다운로드
 # 2. 압축 해제
-unzip finetuned_llama3_crypto.zip -d models/finetuned_llama3/
+unzip finetuned_qwen25_crypto.zip -d models/finetuned_qwen25/
 
 # 3. config.yaml 확인
-# sentiment.model_path: ./models/finetuned_llama3
+# sentiment.model_path: ./models/finetuned_qwen25
 ```
 
-> Render(CPU) 환경에서 8B 모델 직접 로드는 RAM 부족으로 어렵습니다.  
+> Render(CPU) 환경에서 14B 모델 직접 로드는 RAM 부족으로 불가합니다.  
 > HuggingFace Hub에 업로드하거나 별도 GPU 서버로 분리하는 방식을 권장합니다.
 
 ---
@@ -263,12 +264,12 @@ unzip finetuned_llama3_crypto.zip -d models/finetuned_llama3/
 - Confusion matrix (test set)
 - 에폭별 모델 체크포인트 아티팩트
 
-### Colab 실행 순서
+### Kaggle 실행 순서
 
-1. `런타임 → 런타임 유형 변경 → T4 GPU` 선택
-2. (Llama-3만) [HuggingFace 약관 동의](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) + [토큰 발급](https://huggingface.co/settings/tokens)
+1. Kaggle → Accelerator: **GPU T4 x2** 선택
+2. `unsloth/Qwen2.5-14B-bnb-4bit` 는 공개 모델 — HF 로그인 불필요
 3. [W&B API 키 발급](https://wandb.ai/authorize)
-4. 셀 순서대로 실행
+4. 셀 순서대로 실행 (예상 소요: `finetune_llama3` ~1.5~2시간 / `finetune_cryptobert` ~30분)
 
 ---
 
