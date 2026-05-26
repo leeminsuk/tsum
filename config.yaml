@@ -7,8 +7,20 @@ agent:
   request_timeout_sec: 15
 
 sentiment:
-  model_path: ./models/finetuned_cryptobert
-  base_model: ElKulako/cryptobert
+  # ── 모델 경로 설정 ────────────────────────────────────────────────────────
+  # Llama-3 QLoRA 파인튜닝 모델을 사용하려면:
+  #   1. Google Colab에서 finetune_llama3.ipynb 실행 후 zip 다운로드
+  #   2. models/finetuned_llama3/ 폴더에 압축 해제
+  #   3. model_path를 아래로 변경
+  # model_path: ./models/finetuned_llama3
+  #
+  # 기존 CryptoBERT 파인튜닝 모델:
+  # model_path: ./models/finetuned_cryptobert
+  #
+  # 경로에 adapter_config.json이 있으면 자동으로 PEFT(LoRA) 모드로 로드됩니다.
+  model_path: ./models/finetuned_llama3
+  base_model: meta-llama/Meta-Llama-3-8B-Instruct
+  fallback_base_model: ElKulako/cryptobert
   labels:
     0: bearish
     1: neutral
