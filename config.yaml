@@ -8,19 +8,28 @@ agent:
 
 sentiment:
   # ── 모델 경로 설정 ────────────────────────────────────────────────────────
-  # Llama-3 QLoRA 파인튜닝 모델을 사용하려면:
-  #   1. Google Colab에서 finetune_llama3.ipynb 실행 후 zip 다운로드
-  #   2. models/finetuned_llama3/ 폴더에 압축 해제
+  # Qwen2.5-14B unsloth 파인튜닝 모델 (generation 방식):
+  #   1. Kaggle 2xT4에서 finetune_llama3.ipynb 실행 후 zip 다운로드
+  #   2. models/finetuned_qwen25/ 폴더에 압축 해제
   #   3. model_path를 아래로 변경
-  # model_path: ./models/finetuned_llama3
+  # model_path: ./models/finetuned_qwen25
   #
-  # 기존 CryptoBERT 파인튜닝 모델:
-  # model_path: ./models/finetuned_cryptobert
+  # 커스텀 데이터 파인튜닝 결과물 (finetune_cryptobert.ipynb):
+  # model_path: ./models/finetuned_qwen25_custom
   #
-  # 경로에 adapter_config.json이 있으면 자동으로 PEFT(LoRA) 모드로 로드됩니다.
-  model_path: ./models/finetuned_llama3
-  base_model: meta-llama/Meta-Llama-3-8B-Instruct
+  # ※ adapter_config.json이 있으면 PEFT(LoRA) generation 모드로 자동 로드
+  # ※ 모델 없으면 룰 기반 fallback 자동 동작
+  model_path: ./models/finetuned_qwen25
+  base_model: unsloth/Qwen2.5-14B-bnb-4bit
   fallback_base_model: ElKulako/cryptobert
+  # generation 방식 설정
+  generation:
+    max_new_tokens: 5
+    do_sample: false
+    system_prompt: >
+      You are a crypto market sentiment analyzer.
+      Classify the sentiment of the given text as exactly one of:
+      bearish, neutral, bullish. Reply with only the label word.
   labels:
     0: bearish
     1: neutral
