@@ -137,8 +137,8 @@ tsum/
 │
 ├── static/                     # 프론트엔드 (Vanilla JS)
 │
-├── finetune_llama3.ipynb       # 🦙 Qwen2.5-14B unsloth 파인튜닝 HF Hub 데이터 (W&B 연동)
-├── finetune_cryptobert.ipynb   # 🤖 Qwen2.5-14B unsloth 파인튜닝 커스텀 데이터 (W&B 연동)
+├── finetune_qwen25.ipynb       # 🦙 Qwen2.5-14B unsloth 파인튜닝 HF Hub 데이터 (W&B 연동)
+├── finetune_qwen25_custom.ipynb   # 🤖 Qwen2.5-14B unsloth 파인튜닝 커스텀 데이터 (W&B 연동)
 │
 ├── config.yaml                 # 모델 경로 · 시그널 가중치 설정
 ├── requirements.txt            # Python 의존성
@@ -210,7 +210,7 @@ uvicorn app.main:app --reload --port 8000
 | 룰 기반 (키워드 사전) | 0.41 | 모델 없을 때 자동 fallback |
 | CryptoBERT + LoRA | 0.68 | 구형 (더 이상 사용 안 함) |
 | Llama-3-8B + QLoRA | 0.74 | 구형 (더 이상 사용 안 함) |
-| **Qwen2.5-14B + unsloth** | **0.76+ (목표)** | `finetune_llama3.ipynb` / `finetune_cryptobert.ipynb` |
+| **Qwen2.5-14B + unsloth** | **0.76+ (목표)** | `finetune_qwen25.ipynb` / `finetune_qwen25_custom.ipynb` |
 
 ### 파인튜닝 모델 적용 방법
 
@@ -233,26 +233,27 @@ unzip finetuned_qwen25_crypto.zip -d models/finetuned_qwen25/
 두 노트북 모두 **Weights & Biases** 실험 추적이 연동되어 있습니다.  
 학습 중 loss 곡선, 클래스별 F1, confusion matrix를 대시보드에서 실시간으로 확인할 수 있습니다.
 
-### `finetune_llama3.ipynb` — Llama-3-8B QLoRA
+### `finetune_qwen25.ipynb` — Qwen2.5-14B unsloth (HF Hub 데이터)
 
 | 항목 | 값 |
 |------|----|
-| 베이스 모델 | meta-llama/Meta-Llama-3-8B-Instruct |
-| 양자화 | 4-bit NF4 (QLoRA, bitsandbytes) |
+| 베이스 모델 | unsloth/Qwen2.5-14B-bnb-4bit |
+| 양자화 | 4-bit (unsloth pre-quantized) |
 | LoRA rank | r=16, alpha=32 |
-| 학습 가능 파라미터 | ~41M / 8.03B (0.51%) |
-| GPU | Google Colab T4 (16GB) |
-| W&B 프로젝트 | `tsum-llama3-crypto-sentiment` |
+| 학습 방식 | Instruction Tuning (SFTTrainer + ChatML) |
+| GPU | Kaggle 2xT4 (2×16GB, DDP 자동 적용) |
+| W&B 프로젝트 | `tsum-qwen25-crypto-sentiment` |
 
-### `finetune_cryptobert.ipynb` — CryptoBERT LoRA
+### `finetune_qwen25_custom.ipynb` — Qwen2.5-14B unsloth (커스텀 CSV 데이터)
 
 | 항목 | 값 |
 |------|----|
-| 베이스 모델 | ElKulako/cryptobert (125M) |
+| 베이스 모델 | unsloth/Qwen2.5-14B-bnb-4bit |
+| 양자화 | 4-bit (unsloth pre-quantized) |
 | LoRA rank | r=16, alpha=32 |
-| 배치 사이즈 | 16 (T4 기준) |
-| GPU | Google Colab T4 (16GB) |
-| W&B 프로젝트 | `tsum-cryptobert-crypto-sentiment` |
+| 학습 방식 | Instruction Tuning (SFTTrainer + ChatML) |
+| GPU | Kaggle 2xT4 (2×16GB, DDP 자동 적용) |
+| W&B 프로젝트 | `tsum-qwen25-custom-sentiment` |
 
 ### W&B 대시보드에서 확인 가능한 항목
 
@@ -269,7 +270,7 @@ unzip finetuned_qwen25_crypto.zip -d models/finetuned_qwen25/
 1. Kaggle → Accelerator: **GPU T4 x2** 선택
 2. `unsloth/Qwen2.5-14B-bnb-4bit` 는 공개 모델 — HF 로그인 불필요
 3. [W&B API 키 발급](https://wandb.ai/authorize)
-4. 셀 순서대로 실행 (예상 소요: `finetune_llama3` ~1.5~2시간 / `finetune_cryptobert` ~30분)
+4. 셀 순서대로 실행 (예상 소요: `finetune_qwen25` ~1.5~2시간 / `finetune_qwen25_custom` ~30분)
 
 ---
 
