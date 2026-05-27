@@ -2,10 +2,11 @@
 
 > BTC · ETH · SOL · DOGE 실시간 매수/매도/관망 시그널 자동 생성 에이전트
 
-[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-green?logo=fastapi)](https://fastapi.tiangolo.com)
+[![Python](https://img.shields.io/badge/Python-3.14-blue?logo=python)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.136-green?logo=fastapi)](https://fastapi.tiangolo.com)
 [![Render](https://img.shields.io/badge/Deployed-Render-46E3B7?logo=render)](https://render.com)
-[![W&B](https://img.shields.io/badge/Experiments-W%26B-FFBE00?logo=weightsandbiases)](https://wandb.ai)
+[![W&B](https://img.shields.io/badge/Experiments-W%26B-FFBE00?logo=weightsandbiases)](https://wandb.ai/lms040608-/tsum-cryptobert-sentiment)
+[![HuggingFace](https://img.shields.io/badge/Model-HuggingFace-FFD21E?logo=huggingface)](https://huggingface.co/space1637/tsum-cryptobert-sentiment)
 
 ---
 
@@ -18,9 +19,10 @@
 5. [빠른 시작](#5-빠른-시작)
 6. [환경 변수 설정](#6-환경-변수-설정)
 7. [감성 분류 모델](#7-감성-분류-모델)
-8. [파인튜닝 (W&B 연동)](#8-파인튜닝-wb-연동)
-9. [API 명세](#9-api-명세)
-10. [배포 (Render)](#10-배포-render)
+8. [파인튜닝 — Mac 로컬 (권장)](#8-파인튜닝--mac-로컬-권장)
+9. [파인튜닝 — Kaggle (대규모 모델)](#9-파인튜닝--kaggle-대규모-모델)
+10. [API 명세](#10-api-명세)
+11. [배포 (Render)](#11-배포-render)
 
 ---
 
@@ -37,6 +39,7 @@ TSUM은 **암호화폐 인텔리전스 에이전트**다.
 | 배포 환경 | Render (Singapore · Free Tier) |
 | 영구 저장소 | Supabase PostgreSQL |
 | 뉴스 요약 | OpenAI GPT-4o-mini + Tavily |
+| 감성 모델 | **CryptoBERT + LoRA** (Mac M5 Pro 로컬 학습, HF Hub 배포) |
 
 ---
 
@@ -47,10 +50,10 @@ TSUM은 **암호화폐 인텔리전스 에이전트**다.
 | 신호원 | 가중치 | 데이터 출처 |
 |--------|--------|-------------|
 | 기술적 지표 (RSI · MACD · 볼린저밴드) | 30% | Binance Public API |
-| 공포탐욕지수 | 20% | alternative.me |
-| 감성 분석 (뉴스 · SNS) | 20% | CryptoPanic · Reddit · **Qwen2.5-14B unsloth** |
-| 거래소 유입/유출 | 15% | CoinGecko |
-| DeFi TVL | 10% | DeFiLlama |
+| 공포탐욕지수 | 15% | alternative.me |
+| 감성 분석 (뉴스 · SNS) | **35%** | **CryptoBERT + LoRA** (로컬 fine-tuned) |
+| 거래소 유입/유출 | 10% | CoinGecko |
+| DeFi TVL | 5% | DeFiLlama |
 | 고래 거래 | 5% | Whale Alert |
 
 - 매수: 종합 점수 ≥ 0.62 / 매도: ≤ 0.38 / 그 외: 관망
@@ -93,8 +96,8 @@ TSUM은 **암호화폐 인텔리전스 에이전트**다.
 │         │                                            │
 │  ┌──────▼──────────┐  ┌───────────────────────────┐ │
 │  │  Sentiment Model│  │  News Analyzer            │ │
-│  │  Qwen2.5-14B    │  │  OpenAI + Tavily          │ │
-│  │  unsloth LoRA   │  └───────────────────────────┘ │
+│  │  CryptoBERT+LoRA│  │  OpenAI + Tavily          │ │
+│  │  (HF Hub 로드)  │  └───────────────────────────┘ │
 │  └─────────────────┘                                 │
 └──────────────────────────┬──────────────────────────┘
                            │
@@ -102,6 +105,17 @@ TSUM은 **암호화폐 인텔리전스 에이전트**다.
               │     Supabase (PostgreSQL) │
               │  signals · news · settings│
               └──────────────────────────┘
+```
+
+**학습 파이프라인 (별도)**
+
+```
+Mac M5 Pro (MPS)
+  └── training/train_mac.py
+        ├── HuggingFace 공개 데이터셋 (~54K)
+        ├── CryptoBERT + LoRA (r=16, alpha=32)
+        ├── W&B 추적 → wandb.ai/lms040608-/tsum-cryptobert-sentiment
+        └── HF Hub 업로드 → space1637/tsum-cryptobert-sentiment
 ```
 
 ---
@@ -130,15 +144,18 @@ tsum/
 │   └── http.py                 # 공통 HTTP 클라이언트
 │
 ├── models/
-│   └── inference.py            # 감성 모델 로더 (PEFT 자동 감지)
+│   ├── inference.py            # 감성 모델 로더 (rule-based fallback 포함)
+│   └── finetuned_cryptobert/   # LoRA 어댑터 (학습 후 생성 / gitignore)
 │
-├── training/                   # 데이터 수집 스크립트
-│   └── collect_data.py         # CryptoPanic + Reddit 수집
+├── training/
+│   ├── train_mac.py            # 🍎 Mac(M5 Pro) MPS 로컬 학습 스크립트
+│   └── collect_data.py         # CryptoPanic + Reddit 커스텀 데이터 수집
 │
 ├── static/                     # 프론트엔드 (Vanilla JS)
 │
-├── finetune_qwen25.ipynb       # 🦙 Qwen2.5-14B unsloth 파인튜닝 HF Hub 데이터 (W&B 연동)
-├── finetune_qwen25_custom.ipynb   # 🤖 Qwen2.5-14B unsloth 파인튜닝 커스텀 데이터 (W&B 연동)
+├── finetune_cryptobert.ipynb   # CryptoBERT Colab/Kaggle 학습 노트북 (레거시)
+├── finetune_qwen25.ipynb       # Qwen2.5-14B unsloth (HF Hub 데이터, Kaggle 전용)
+├── finetune_qwen25_custom.ipynb  # Qwen2.5-14B unsloth (커스텀 데이터, Kaggle 전용)
 │
 ├── config.yaml                 # 모델 경로 · 시그널 가중치 설정
 ├── requirements.txt            # Python 의존성
@@ -152,7 +169,7 @@ tsum/
 
 ### 사전 요구사항
 
-- Python 3.11+
+- Python 3.11+ (권장: 3.14 — `.venv` 이미 포함)
 - OpenAI API 키 (뉴스 요약 필수)
 - Tavily API 키 (뉴스 수집 필수)
 
@@ -172,11 +189,16 @@ pip install -r requirements.txt
 cp .env.example .env
 # .env 파일을 열어 API 키 입력
 
-# 4. 서버 실행
+# 4. (선택) 감성 모델 파인튜닝
+python training/train_mac.py     # Mac M5 Pro 기준 약 20~25분
+
+# 5. 서버 실행
 uvicorn app.main:app --reload --port 8000
 ```
 
 브라우저에서 `http://localhost:8000` 접속
+
+> 💡 **모델 없이도 실행 가능** — 감성 모델 미로드 시 rule-based fallback 자동 적용
 
 ---
 
@@ -188,12 +210,12 @@ uvicorn app.main:app --reload --port 8000
 |------|------|------|
 | `OPENAI_API_KEY` | ✅ 필수 | 뉴스 요약 (GPT-4o-mini) |
 | `TAVILY_API_KEY` | ✅ 필수 | 뉴스 검색 |
+| `HF_TOKEN` | 파인튜닝 시 | HuggingFace 토큰 (모델 업로드) |
+| `HF_USERNAME` | 파인튜닝 시 | HuggingFace 사용자 ID |
+| `WANDB_API_KEY` | 파인튜닝 시 | W&B 실험 추적 |
 | `SUPABASE_URL` | 권장 | 없으면 `/tmp` 파일에 저장 (재배포 시 초기화) |
 | `SUPABASE_SERVICE_KEY` | 권장 | Supabase 인증 키 |
-| `CRYPTOPANIC_API_KEY` | 선택 | 없으면 rule-based fallback |
-| `NEWSAPI_KEY` | 선택 | 없으면 rule-based fallback |
-| `ETHERSCAN_API_KEY` | 선택 | 이더리움 온체인 데이터 |
-| `WHALE_ALERT_API_KEY` | 선택 | 고래 거래 탐지 |
+| `CRYPTOPANIC_API_KEY` | 선택 | 커스텀 데이터 수집용 |
 | `COINGECKO_API_KEY` | 선택 | 없으면 무료 플랜 rate limit 적용 |
 | `DEFAULT_COIN` | 선택 | 기본값 `bitcoin` |
 | `INTERVAL_HOURS` | 선택 | 분석 주기 (기본값 `5`) |
@@ -202,79 +224,117 @@ uvicorn app.main:app --reload --port 8000
 
 ## 7. 감성 분류 모델
 
-시그널 엔진의 감성 분석 컴포넌트(가중치 20%)에서 사용하는 모델.  
-`models/inference.py`가 `adapter_config.json` 존재 여부로 **PEFT 모델 자동 감지**한다.
+**분류 클래스**: `bearish` / `neutral` / `bullish`
 
 | 모델 | Macro F1 | 비고 |
 |------|----------|------|
-| 룰 기반 (키워드 사전) | 0.41 | 모델 없을 때 자동 fallback |
-| CryptoBERT + LoRA | 0.68 | 구형 (더 이상 사용 안 함) |
-| Llama-3-8B + QLoRA | 0.74 | 구형 (더 이상 사용 안 함) |
-| **Qwen2.5-14B + unsloth** | **0.76+ (목표)** | `finetune_qwen25.ipynb` / `finetune_qwen25_custom.ipynb` |
+| 룰 기반 (키워드 사전) | 0.41 | fallback — 모델 미로드 시 자동 |
+| **CryptoBERT + LoRA** | **0.68+** | **현재 운영** — Mac MPS 로컬 학습 |
+| Qwen2.5-14B + unsloth | 0.76+ (목표) | Kaggle 2xT4 전용 |
 
-### 파인튜닝 모델 적용 방법
+### 모델 로드 우선순위 (`models/inference.py`)
 
-```bash
-# 1. Kaggle 2xT4에서 노트북 실행 후 zip 다운로드
-# 2. 압축 해제
-unzip finetuned_qwen25_crypto.zip -d models/finetuned_qwen25/
-
-# 3. config.yaml 확인
-# sentiment.model_path: ./models/finetuned_qwen25
+```
+models/finetuned_cryptobert/ 존재 → PEFT pipeline 로드
+  ↓ 없으면
+LOAD_BASE_MODEL=true → HuggingFace Hub에서 자동 다운로드
+  ↓ 없으면
+rule-based fallback (키워드 사전)
 ```
 
-> Render(CPU) 환경에서 14B 모델 직접 로드는 RAM 부족으로 불가합니다.  
-> HuggingFace Hub에 업로드하거나 별도 GPU 서버로 분리하는 방식을 권장합니다.
+### HuggingFace Hub 모델 사용
+
+```bash
+# .env에 추가
+LOAD_BASE_MODEL=true
+MODEL_PATH=space1637/tsum-cryptobert-sentiment
+```
+
+또는 로컬 학습 후 직접 사용:
+
+```bash
+python training/train_mac.py  # → models/finetuned_cryptobert/ 에 저장됨
+```
 
 ---
 
-## 8. 파인튜닝 (W&B 연동)
+## 8. 파인튜닝 — Mac 로컬 (권장)
 
-두 노트북 모두 **Weights & Biases** 실험 추적이 연동되어 있습니다.  
-학습 중 loss 곡선, 클래스별 F1, confusion matrix를 대시보드에서 실시간으로 확인할 수 있습니다.
+> **CryptoBERT (~110M params)** × Apple Silicon MPS 가속  
+> API 키 없이 HuggingFace 공개 데이터셋만으로 학습 완료
 
-### `finetune_qwen25.ipynb` — Qwen2.5-14B unsloth (HF Hub 데이터)
-
-| 항목 | 값 |
-|------|----|
-| 베이스 모델 | unsloth/Qwen2.5-14B-bnb-4bit |
-| 양자화 | 4-bit (unsloth pre-quantized) |
-| LoRA rank | r=16, alpha=32 |
-| 학습 방식 | Instruction Tuning (SFTTrainer + ChatML) |
-| GPU | Kaggle 2xT4 (2×16GB, DDP 자동 적용) |
-| W&B 프로젝트 | `tsum-qwen25-crypto-sentiment` |
-
-### `finetune_qwen25_custom.ipynb` — Qwen2.5-14B unsloth (커스텀 CSV 데이터)
+### 학습 환경
 
 | 항목 | 값 |
 |------|----|
-| 베이스 모델 | unsloth/Qwen2.5-14B-bnb-4bit |
-| 양자화 | 4-bit (unsloth pre-quantized) |
+| 디바이스 | Apple M5 Pro (MPS) |
+| 모델 | ElKulako/cryptobert |
 | LoRA rank | r=16, alpha=32 |
-| 학습 방식 | Instruction Tuning (SFTTrainer + ChatML) |
-| GPU | Kaggle 2xT4 (2×16GB, DDP 자동 적용) |
-| W&B 프로젝트 | `tsum-qwen25-custom-sentiment` |
+| 데이터 | financial-tweets-crypto(~48K) + twitter-financial-news(~9.5K) = 54K |
+| 학습 방식 | WeightedCE + LoRA (SEQ_CLS) |
+| W&B 프로젝트 | `tsum-cryptobert-sentiment` |
+| HF Hub | [`space1637/tsum-cryptobert-sentiment`](https://huggingface.co/space1637/tsum-cryptobert-sentiment) |
+| 소요 시간 | M5 Pro 24GB 기준 약 20~25분 |
+
+### 실행
+
+```bash
+# 1. ML 의존성 추가 설치
+pip install torch transformers peft accelerate datasets scikit-learn pandas wandb huggingface_hub
+
+# 2. .env에 추가
+HF_TOKEN=hf_...
+HF_USERNAME=your-hf-username
+WANDB_API_KEY=wandb_v1_...
+
+# 3. 학습 실행
+python training/train_mac.py
+```
 
 ### W&B 대시보드에서 확인 가능한 항목
 
-- 학습/검증 loss 곡선
+- Train / Eval loss 곡선 (epoch별)
 - Accuracy, Macro F1, 클래스별 F1 (bearish / neutral / bullish)
-- Learning rate cosine decay 커브
 - 그래디언트 히스토그램
-- Per-class F1 bar chart
-- Confusion matrix (test set)
-- 에폭별 모델 체크포인트 아티팩트
+- 모델 체크포인트 아티팩트
 
-### Kaggle 실행 순서
-
-1. Kaggle → Accelerator: **GPU T4 x2** 선택
-2. `unsloth/Qwen2.5-14B-bnb-4bit` 는 공개 모델 — HF 로그인 불필요
-3. [W&B API 키 발급](https://wandb.ai/authorize)
-4. 셀 순서대로 실행 (예상 소요: `finetune_qwen25` ~1.5~2시간 / `finetune_qwen25_custom` ~30분)
+[→ W&B 대시보드 보기](https://wandb.ai/lms040608-/tsum-cryptobert-sentiment)
 
 ---
 
-## 9. API 명세
+## 9. 파인튜닝 — Kaggle (대규모 모델)
+
+> **Qwen2.5-14B unsloth** — 14B 모델 4-bit 양자화 + Instruction Tuning  
+> Kaggle 2xT4 GPU(각 16GB) 환경 필요
+
+### 노트북 목록
+
+| 노트북 | 데이터 | W&B 프로젝트 | 소요 |
+|--------|--------|-------------|------|
+| `finetune_qwen25.ipynb` | HF Hub (~57K) | `tsum-qwen25-crypto-sentiment` | ~1.5~2h |
+| `finetune_qwen25_custom.ipynb` | 커스텀 CSV | `tsum-qwen25-custom-sentiment` | ~30분 |
+
+### Kaggle 실행 순서
+
+1. Kaggle → 새 Notebook → 파일 업로드
+2. Accelerator: **GPU T4 x2** 선택
+3. [W&B API 키 발급](https://wandb.ai/authorize)
+4. 셀 순서대로 실행
+
+### 커스텀 데이터 수집 (선택)
+
+```bash
+python training/collect_data.py \
+  --coins bitcoin ethereum solana dogecoin \
+  --days 60 \
+  --output data/crypto_news_labeled.csv
+```
+
+필수 API: `CRYPTOPANIC_API_KEY` (무료, cryptopanic.com)
+
+---
+
+## 10. API 명세
 
 | 메서드 | 경로 | 설명 |
 |--------|------|------|
@@ -291,7 +351,7 @@ unzip finetuned_qwen25_crypto.zip -d models/finetuned_qwen25/
 
 ---
 
-## 10. 배포 (Render)
+## 11. 배포 (Render)
 
 `render.yaml`이 포함되어 있어 Render에 레포를 연결하면 자동 배포됩니다.
 
@@ -311,7 +371,8 @@ services:
 1. [Render 대시보드](https://dashboard.render.com) → **New Web Service**
 2. GitHub 레포 연결 → `main` 브랜치 선택
 3. 환경 변수 입력 (`OPENAI_API_KEY`, `TAVILY_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`)
-4. **Deploy** 클릭
+4. 감성 모델 사용 시 추가: `LOAD_BASE_MODEL=true`, `MODEL_PATH=space1637/tsum-cryptobert-sentiment`
+5. **Deploy** 클릭
 
 > ⚠️ Free Tier는 15분 비활성 시 슬립 상태로 전환됩니다.  
 > 안정적인 운영을 위해 Starter Plan 이상을 권장합니다.
