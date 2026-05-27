@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TSUM 감성 분석 파이프라인</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    background: #f8f9fa;
+    padding: 40px;
+    min-width: 1200px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 32px;
+    letter-spacing: -0.5px;
+  }
+
+  /* ─── 상단 가로 파이프라인 ─── */
+  .pipeline-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+  }
+
+  .step-box {
+    width: 200px;
+    min-height: 120px;
+    border-radius: 12px;
+    padding: 16px 14px;
+    text-align: center;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+  }
+
+  .step-box .step-num {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .step-box .step-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .step-box .step-sub {
+    font-size: 11px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* 색상 */
+  .blue   { background: #EBF4FF; border-color: #5B9BD5; }
+  .blue   .step-num { color: #2E6DA4; }
+  .green  { background: #EAFAF1; border-color: #57B894; }
+  .green  .step-num { color: #1E8449; }
+  .yellow { background: #FFFBE6; border-color: #F0C040; }
+  .yellow .step-num { color: #B7860B; }
+  .red    { background: #FDECEA; border-color: #E57373; }
+  .red    .step-num { color: #C0392B; }
+  .purple { background: #F3E5F5; border-color: #AB47BC; }
+  .purple .step-num { color: #7B1FA2; }
+
+  /* 화살표 */
+  .arrow {
+    font-size: 24px;
+    color: #888;
+    padding: 0 8px;
+    flex-shrink: 0;
+  }
+
+  /* ─── 중단 다크 배너 ─── */
+  .output-banner {
+    background: #1a1a2e;
+    color: #fff;
+    border-radius: 10px;
+    padding: 16px 32px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .output-banner .banner-num { font-size: 13px; color: #aaa; margin-bottom: 4px; }
+  .output-banner .banner-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .output-banner .banner-sub { font-size: 12px; color: #ccc; }
+
+  /* ─── 하단 결과 3분기 ─── */
+  .result-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 28px;
+  }
+
+  .result-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 260px;
+  }
+
+  .result-label {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 16px;
+    border-radius: 20px;
+  }
+  .label-sell  { background: #FDECEA; color: #C0392B; }
+  .label-hold  { background: #FFFBE6; color: #B7860B; }
+  .label-buy   { background: #EAFAF1; color: #1E8449; }
+
+  .result-card {
+    width: 100%;
+    border-radius: 12px;
+    padding: 16px 14px;
+    border: 2px solid transparent;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .result-card .icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .result-card .card-body { text-align: left; }
+  .result-card .card-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .result-card .card-desc  { font-size: 11px; color: #555; line-height: 1.5; }
+
+  .card-sell { background: #FDECEA; border-color: #E57373; }
+  .card-hold { background: #FFFBE6; border-color: #F0C040; }
+  .card-buy  { background: #EAFAF1; border-color: #57B894; }
+
+  /* 아래 화살표 */
+  .down-arrow {
+    text-align: center;
+    font-size: 20px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+
+  /* ─── 하단 보조 박스 ─── */
+  .detail-box {
+    background: #fff;
+    border: 2px solid #B39DDB;
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin: 0 auto 28px;
+    max-width: 900px;
+    text-align: center;
+  }
+  .detail-box .det-title { font-size: 15px; font-weight: 700; color: #6A1B9A; margin-bottom: 10px; }
+  .detail-box .det-grid {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .detail-box .det-item { font-size: 12px; color: #333; line-height: 1.7; text-align: center; }
+  .detail-box .det-item b { display: block; font-size: 13px; color: #6A1B9A; margin-bottom: 2px; }
+
+  /* ─── 하단 핵심 원칙 ─── */
+  .principle-bar {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .principle-bar span {
+    font-size: 12px;
+    color: #444;
+  }
+  .principle-bar span b { color: #1a1a2e; }
+
+  /* 연결 점선 */
+  .dot-line {
+    border-top: 2px dashed #ccc;
+    width: 60px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>TSUM 암호화폐 감성 분석 AI 파이프라인</h1>
+
+<!-- ① ~ ④ 가로 흐름 -->
+<div class="pipeline-row">
+
+  <div class="step-box blue">
+    <div class="step-num">① 데이터 수집</div>
+    <div class="step-title">Data Collector</div>
+    <div class="step-sub">
+      뉴스 헤드라인 (CryptoPanic)<br>
+      SNS 텍스트 (Reddit)<br>
+      HuggingFace 공개 데이터셋
+    </div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="step-box green">
+    <div class="step-num">② 전처리</div>
+    <div class="step-title">Text Preprocessing</div>
+    <div class="step-sub">
+      URL 제거 · 이모지 정제<br>
+      중복 제거 · 토크나이징<br>
+      max_length 192 트런케이션
+    </div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="step-box yellow">
+    <div class="step-num">③ 감성 분류 AI</div>
+    <div class="step-title">CryptoBERT + LoRA</div>
+    <div class="step-sub">
+      ElKulako/cryptobert (110M)<br>
+      LoRA r=16, alpha=32<br>
+      M5 Pro MPS · 54K 학습
+    </div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="step-box red">
+    <div class="step-num">④ 시그널 엔진</div>
+    <div class="step-title">Signal Engine</div>
+    <div class="step-sub">
+      감성(35%) + 기술지표(30%)<br>
+      공포탐욕(15%) + 온체인(20%)<br>
+      가중 합산 → 임계값 판단
+    </div>
+  </div>
+
+</div>
+
+<!-- ⑤ 다크 배너 -->
+<div class="output-banner">
+  <div class="banner-num">⑤ 최종 매매 시그널 출력</div>
+  <div class="banner-title">Decision Engine — 종합 점수에 따라 3가지 시그널 중 하나로 판정</div>
+  <div class="banner-sub">BUY (≥ 0.62) &nbsp;·&nbsp; HOLD (0.38 ~ 0.62) &nbsp;·&nbsp; SELL (≤ 0.38) &nbsp;|&nbsp; 충돌 신호 발생 시 패널티(−0.12) 적용</div>
+</div>
+
+<!-- 아래 화살표 3개 -->
+<div style="display:flex; justify-content:center; gap:144px; margin-bottom:6px;">
+  <div class="down-arrow">↓</div>
+  <div class="down-arrow">↓</div>
+  <div class="down-arrow">↓</div>
+</div>
+
+<!-- 결과 레이블 -->
+<div style="display:flex; justify-content:center; gap:90px; margin-bottom:10px;">
+  <span class="result-label label-sell">매도 신호일 때</span>
+  <span class="result-label label-hold">관망 신호일 때</span>
+  <span class="result-label label-buy">매수 신호일 때</span>
+</div>
+
+<!-- 결과 카드 3종 -->
+<div class="result-row">
+
+  <div class="result-card card-sell">
+    <div class="icon">📉</div>
+    <div class="card-body">
+      <div class="card-title">SELL 시그널</div>
+      <div class="card-desc">종합 점수 ≤ 0.38<br>bearish 감성 우세<br>하락 위험 경고 표시</div>
+    </div>
+  </div>
+
+  <div class="result-card card-hold">
+    <div class="icon">⏸️</div>
+    <div class="card-body">
+      <div class="card-title">HOLD 시그널</div>
+      <div class="card-desc">종합 점수 0.38 ~ 0.62<br>neutral 감성 우세<br>관망 유지 권고</div>
+    </div>
+  </div>
+
+  <div class="result-card card-buy">
+    <div class="icon">📈</div>
+    <div class="card-body">
+      <div class="card-title">BUY 시그널</div>
+      <div class="card-desc">종합 점수 ≥ 0.62<br>bullish 감성 우세<br>매수 기회 알림</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 점선 + 보조 설명 -->
+<div style="text-align:center; margin-bottom:6px;">
+  <span style="font-size:12px; color:#888;">▼ 시그널 근거 상세 정보</span>
+</div>
+
+<!-- 모델 상세 박스 -->
+<div class="detail-box">
+  <div class="det-title">📊 사용 모델 및 파인튜닝 세부 정보</div>
+  <div class="det-grid">
+    <div class="det-item">
+      <b>베이스 모델</b>
+      ElKulako/cryptobert<br>(BERT-base, 110M params)
+    </div>
+    <div class="det-item">
+      <b>파인튜닝 기법</b>
+      LoRA (r=16, α=32)<br>학습 파라미터: 1.18M (0.94%)
+    </div>
+    <div class="det-item">
+      <b>학습 데이터</b>
+      54,262건 (영어 크립토 뉴스)<br>bearish / neutral / bullish
+    </div>
+    <div class="det-item">
+      <b>학습 환경</b>
+      Apple M5 Pro · MPS 가속<br>소요 시간: ~20분
+    </div>
+    <div class="det-item">
+      <b>성능 (Test Set)</b>
+      Accuracy&nbsp;<b style="color:#1E8449">0.6659</b><br>Macro F1&nbsp;<b style="color:#1E8449">0.6447</b>
+    </div>
+    <div class="det-item">
+      <b>모델 배포</b>
+      HuggingFace Hub<br>space1637/tsum-cryptobert
+    </div>
+  </div>
+</div>
+
+<!-- 핵심 원칙 -->
+<div class="principle-bar">
+  <span><b>베이스 모델 선택 :</b> 크립토 도메인 특화 CryptoBERT</span>
+  <span>·</span>
+  <span><b>효율적 파인튜닝 :</b> LoRA — 전체 파라미터의 0.94%만 학습</span>
+  <span>·</span>
+  <span><b>클래스 불균형 대응 :</b> Weighted CrossEntropy Loss</span>
+  <span>·</span>
+  <span><b>감정 배제 의사결정 :</b> 룰 기반 대비 Macro F1 +23%p 향상</span>
+</div>
+
+</body>
+</html>
