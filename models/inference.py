@@ -244,14 +244,9 @@ class CryptoSentimentModel:
 
     def _make_prompt(self, text: str) -> str:
         return (
-            f"<|im_start|>system
-{self.system_prompt}<|im_end|>
-"
-            f"<|im_start|>user
-{text}<|im_end|>
-"
-            f"<|im_start|>assistant
-"
+            f"<|im_start|>system\n{self.system_prompt}<|im_end|>\n"
+            f"<|im_start|>user\n{text}<|im_end|>\n"
+            f"<|im_start|>assistant\n"
         )
 
     def _parse_label(self, response: str) -> str:
