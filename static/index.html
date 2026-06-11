@@ -524,6 +524,14 @@ async function fetchLiquidation() {
   } catch(e) { document.getElementById('liqSource').textContent = '로드 실패'; }
 }
 
+function fmtPrice(p) {
+  // 가격 크기별 동적 소수점 — BTC $62,975 / SOL $65.41 / DOGE $0.0823
+  if (p >= 1000) return '$' + Math.round(p).toLocaleString();
+  if (p >= 10)   return '$' + p.toFixed(2);
+  if (p >= 0.1)  return '$' + p.toFixed(4);
+  return '$' + p.toFixed(6);
+}
+
 function drawLiqMap(currentPrice, levels) {
   const canvas = document.getElementById('liqCanvas');
   const dpr = window.devicePixelRatio || 1;
@@ -553,7 +561,7 @@ function drawLiqMap(currentPrice, levels) {
     ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l+cW, y); ctx.stroke();
     const p = maxP - pRange * (i/4);
     ctx.fillStyle = '#6060a0'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
-    ctx.fillText('$'+Math.round(p).toLocaleString(), PAD.l-5, y+3);
+    ctx.fillText(fmtPrice(p), PAD.l-5, y+3);
   }
   const midX = PAD.l + cW/2;
   ctx.strokeStyle = '#3a3a5a'; ctx.setLineDash([3,3]); ctx.lineWidth = 1;
@@ -579,7 +587,7 @@ function drawLiqMap(currentPrice, levels) {
     ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l+cW, y); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = '#7c6af7'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'right';
-    ctx.fillText('$'+Math.round(currentPrice).toLocaleString(), PAD.l-5, y+3);
+    ctx.fillText(fmtPrice(currentPrice), PAD.l-5, y+3);
   }
   ctx.fillStyle = '#5050a0'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
   ctx.fillText('← 롱 청산', midX - half*0.5, PAD.t+cH+18);

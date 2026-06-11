@@ -71,10 +71,12 @@ def _estimated_liq_map(symbol: str) -> dict:
         leverage_dist = {5: 0.10, 10: 0.30, 20: 0.30, 50: 0.20, 100: 0.10}
 
         levels = []
+        # 가격 크기에 맞는 소수 자릿수 — DOGE($0.08) 같은 소수점 코인이 0으로 뭉개지지 않게
+        decimals = 0 if current_price >= 1000 else 2 if current_price >= 10 else 4 if current_price >= 0.1 else 6
         # 현재가 기준 -25% ~ +25%  (1% 단위)
         for pct_i in range(-25, 26):
             pct = pct_i / 100
-            level_price = round(current_price * (1 + pct))
+            level_price = round(current_price * (1 + pct), decimals)
             long_liq = 0.0
             short_liq = 0.0
 
