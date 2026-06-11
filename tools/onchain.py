@@ -6,6 +6,7 @@ import math
 
 from tools.config import CONFIG, env
 from tools.http import HttpClient
+from tools import cg
 
 
 class OnchainAnalyzer:
@@ -16,16 +17,11 @@ class OnchainAnalyzer:
 
     def get_price(self, coin: str) -> dict[str, Any]:
         cg_id = self._coingecko_id(coin)
-        headers = {}
-        if env("COINGECKO_API_KEY"):
-            headers["x-cg-demo-api-key"] = env("COINGECKO_API_KEY") or ""
         try:
-            data = self.http.get_json(
-                "https://api.coingecko.com/api/v3/simple/price",
-                params={"ids": cg_id, "vs_currencies": "usd", "include_24hr_change": "true", "include_market_cap": "true"},
-                headers=headers or None,
-            )
-            row = data.get(cg_id, {})
+            # 전체 코인 배치 1회 호출 + 60초 캐시 — 코인별 개별 호출로 한도를 태우지 않는다
+            row = cg.batch_prices(self.http, cg_id)
+            if row.get("usd") is None:
+                raise RuntimeError(f"no price row for {cg_id}")
             return {"coin": coin, "coingecko_id": cg_id, "usd": row.get("usd"), "usd_24h_change": row.get("usd_24h_change"), "usd_market_cap": row.get("usd_market_cap"), "source": "coingecko"}
         except Exception as exc:
             return {"coin": coin, "usd": self._mock_price(coin), "usd_24h_change": 0.0, "source": "mock", "error": str(exc)}
@@ -86,16 +82,9 @@ class OnchainAnalyzer:
         vol_ratio < 0.7           → 거래 위축(neutral)
         """
         cg_id = self._coingecko_id(coin)
-        headers = {}
-        if env("COINGECKO_API_KEY"):
-            headers["x-cg-demo-api-key"] = env("COINGECKO_API_KEY") or ""
         try:
-            # 7일치 일별 거래량 + 가격 조회
-            chart = self.http.get_json(
-                f"https://api.coingecko.com/api/v3/coins/{cg_id}/market_chart",
-                params={"vs_currency": "usd", "days": 7, "interval": "daily"},
-                headers=headers or None,
-            )
+            # 7일치 일별 거래량 + 가격 조회 (공유 캐시 — technical과 중복 호출 방지)
+            chart = cg.market_chart(self.http, cg_id, days=7)
             volumes = [v[1] for v in chart.get("total_volumes", [])]
             prices  = [p[1] for p in chart.get("prices", [])]
 

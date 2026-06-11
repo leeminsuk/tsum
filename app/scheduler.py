@@ -18,7 +18,7 @@ def _all_coins_job() -> None:
     for coin in COINS:
         try:
             run_analysis(coin=coin)
-            time.sleep(2)  # CoinGecko rate limit 간격
+            time.sleep(5)  # CoinGecko rate limit 간격 (배치 캐시 도입 후에도 여유 확보)
         except Exception as exc:
             logger.error(f"Scheduled analysis failed for {coin}: {exc}")
 

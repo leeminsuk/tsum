@@ -21,6 +21,7 @@ from typing import Any
 
 from tools.config import CONFIG, env
 from tools.http import HttpClient
+from tools import cg
 
 logger = logging.getLogger(__name__)
 
@@ -213,13 +214,9 @@ class TechnicalAnalyzer:
 
     def _fetch_market_chart(self, cg_id: str, days: int, headers: dict) -> dict:
         try:
-            data = self.http.get_json(
-                f"https://api.coingecko.com/api/v3/coins/{cg_id}/market_chart",
-                params={"vs_currency": "usd", "days": days, "interval": "daily"},
-                headers=headers or None,
-            )
+            data = cg.market_chart(self.http, cg_id, days=days)  # 공유 캐시 (5분 TTL)
             time.sleep(COINGECKO_DELAY)
-            return data if isinstance(data, dict) else {}
+            return data
         except Exception as e:
             logger.warning(f"market_chart fetch failed ({cg_id}): {e}")
             return {}
