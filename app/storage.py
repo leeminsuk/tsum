@@ -45,15 +45,17 @@ def _supabase():
 
 _file_lock = threading.Lock()
 _FILE = Path(os.getenv("STORAGE_FILE", "/tmp/tsum_signals.json"))
-_BLOB_PATH = "state/signals.json"
+
+# Blob은 코인별 문서로 분리 — 단일 파일 read-modify-write를 여러 람다가 동시에
+# 수행하면 다른 코인의 업데이트가 유실된다(lost update)
+ALL_COINS = ["bitcoin", "ethereum", "solana", "dogecoin"]
+
+
+def _blob_path(coin: str) -> str:
+    return f"state/signals/{coin}.json"
 
 
 def _file_load() -> list[dict]:
-    from app import blob_store
-    if blob_store.available():
-        data = blob_store.get_json(_BLOB_PATH)
-        if data is not None:
-            return data
     try:
         if _FILE.exists():
             return json.loads(_FILE.read_text(encoding="utf-8"))
@@ -63,9 +65,6 @@ def _file_load() -> list[dict]:
 
 
 def _file_save(signals: list[dict]) -> None:
-    from app import blob_store
-    if blob_store.available() and blob_store.put_json(_BLOB_PATH, signals):
-        return
     _FILE.write_text(json.dumps(signals, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
@@ -83,6 +82,16 @@ def get_signals(coin: str | None = None) -> list[dict]:
             return res.data or []
         except Exception as exc:
             logger.warning(f"Supabase read failed: {exc}")
+
+    from app import blob_store
+    if blob_store.available():
+        if coin:
+            return (blob_store.get_json(_blob_path(coin.lower())) or [])[:MAX_STACK]
+        merged: list[dict] = []
+        for c in ALL_COINS:
+            merged.extend(blob_store.get_json(_blob_path(c)) or [])
+        merged.sort(key=lambda s: s.get("generated_at", ""), reverse=True)
+        return merged[:MAX_STACK]
 
     with _file_lock:
         all_signals = _file_load()
@@ -139,6 +148,15 @@ def push_signal(data: dict[str, Any]) -> list[dict]:
             return get_signals(coin=coin)
         except Exception as exc:
             logger.warning(f"Supabase write failed: {exc}")
+
+    from app import blob_store
+    if blob_store.available():
+        stack = blob_store.get_json(_blob_path(coin)) or []
+        stack.insert(0, entry)
+        stack = stack[:MAX_STACK]
+        if blob_store.put_json(_blob_path(coin), stack):
+            return stack
+        # blob 쓰기 실패 시 파일 폴백으로 계속
 
     # File fallback — 코인별 MAX_STACK 유지
     with _file_lock:
