@@ -470,7 +470,7 @@ async function fetchStatus() {
     document.getElementById('intervalDisplay').textContent = `${d.settings.interval_hours}h`;
     document.getElementById('coinDisplay').textContent =
       currentCoin.charAt(0).toUpperCase() + currentCoin.slice(1);
-    if (d.next_run) nextRunTs = new Date(d.next_run).getTime();
+    nextRunTs = d.next_run ? new Date(d.next_run).getTime() : null;
 
     if (d.latest_action) {
       document.getElementById('latestAction').textContent = d.latest_action;
@@ -751,9 +751,17 @@ function drawBubbleMap(coins) {
 function startCountdown() {
   if (countdownTimer) clearInterval(countdownTimer);
   countdownTimer = setInterval(() => {
-    if (!nextRunTs) { document.getElementById('countdown').textContent = '—'; return; }
+    if (!nextRunTs) {
+      document.getElementById('countdown').textContent = '—';
+      document.getElementById('nextRunTime').textContent = '—';
+      return;
+    }
     const diff = nextRunTs - Date.now();
-    if (diff <= 0) { document.getElementById('countdown').textContent = '곧 시작...'; return; }
+    if (diff <= 0) {
+      document.getElementById('countdown').textContent = '곧 시작...';
+      document.getElementById('nextRunTime').textContent = '밀린 분석 재개 대기 중';
+      return;
+    }
     const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
     document.getElementById('countdown').textContent =
       `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
