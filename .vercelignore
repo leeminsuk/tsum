@@ -1,0 +1,14 @@
+# 서버리스 번들 250MB 제한 — 런타임에 불필요한 대용량/로컬 전용 파일 제외
+models/finetuned_cryptobert/
+models/finetuned_qwen25/
+models/finetuned_qwen25_custom/
+wandb/
+training/
+results/
+data/
+tests/
+*.ipynb
+render.yaml
+supabase_schema.sql
+.env
+__pycache__/

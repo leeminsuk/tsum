@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -19,9 +20,17 @@ logger = logging.getLogger(__name__)
 
 STATIC_DIR = Path(__file__).resolve().parents[1] / "static"
 
+# Vercel 서버리스: 인스턴스가 요청 단위로 뜨고 사라지므로 상주 스케줄러·기동 시
+# 일괄 분석이 불가능하다 — vercel.json crons가 /api/cron을 대신 호출한다
+IS_SERVERLESS = bool(os.getenv("VERCEL"))
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if IS_SERVERLESS:
+        yield
+        return
+
     cfg = load_settings()
     scheduler.start(interval_hours=cfg["interval_hours"])
 
@@ -136,6 +145,35 @@ async def get_liquidation(symbol: str = "BTC"):
 async def get_bubbles():
     from tools.market_viz import fetch_bubble_coins
     return fetch_bubble_coins()
+
+
+# ── Cron (Vercel) ─────────────────────────────────────────────────────────────
+
+@app.get("/api/cron")
+async def cron(request: Request):
+    """Vercel Cron이 호출 — 전 코인 분석 + 뉴스 분석을 1회 수행."""
+    secret = os.getenv("CRON_SECRET")
+    if secret and request.headers.get("authorization") != f"Bearer {secret}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    from app.runner import run_analysis
+    from app.news_runner import run_news_analysis
+
+    results: dict[str, str] = {}
+    for c in COINS:
+        try:
+            r = run_analysis(coin=c)
+            results[c] = r["signal"]["action"]
+        except Exception as exc:
+            logger.error(f"Cron analysis failed for {c}: {exc}")
+            results[c] = f"error: {exc}"
+    try:
+        run_news_analysis()
+        results["news"] = "ok"
+    except Exception as exc:
+        logger.error(f"Cron news analysis failed: {exc}")
+        results["news"] = f"error: {exc}"
+    return {"ok": True, "results": results}
 
 
 # ── News API ──────────────────────────────────────────────────────────────────

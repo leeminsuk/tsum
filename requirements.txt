@@ -16,14 +16,8 @@ tavily-python>=0.3.0
 # PEFT/LoRA 모델:
 #   pip install transformers>=4.41.0 peft>=0.11.0 accelerate>=0.30.0
 #
-# Mac(M5 Pro) 로컬 파인튜닝:
-torch>=2.12.0
-transformers>=4.41.0
-peft>=0.11.0
-accelerate>=0.30.0
-datasets>=2.19.0
-scikit-learn>=1.4.0
-pandas>=2.0.0
-wandb>=0.27.0
-huggingface_hub>=1.0.0
-sentencepiece
+# Mac(M5 Pro) 로컬 파인튜닝 (vercel 브랜치에서는 제외 — 서버리스 250MB 제한,
+# models/inference.py가 룰 기반으로 자동 폴백):
+#   pip install torch>=2.12.0 transformers>=4.41.0 peft>=0.11.0 accelerate>=0.30.0 \
+#     datasets>=2.19.0 scikit-learn>=1.4.0 pandas>=2.0.0 wandb>=0.27.0 \
+#     huggingface_hub>=1.0.0 sentencepiece
