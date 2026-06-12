@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 MAX_STACK = 5
 _lock = threading.Lock()
 _NEWS_FILE = Path(os.getenv("NEWS_FILE", "/tmp/tsum_news.json"))
+_BLOB_PATH = "state/news.json"
 
 
 def _load_supabase():
@@ -33,6 +34,11 @@ def get_news() -> list[dict]:
             return res.data or []
         except Exception as e:
             logger.warning(f"Supabase news read failed: {e}")
+    from app import blob_store
+    if blob_store.available():
+        data = blob_store.get_json(_BLOB_PATH)
+        if data is not None:
+            return data
     if _NEWS_FILE.exists():
         try:
             return json.loads(_NEWS_FILE.read_text())
@@ -55,9 +61,12 @@ def push_news(item: dict) -> None:
             except Exception as e:
                 logger.warning(f"Supabase news write failed: {e}")
 
+        from app import blob_store
         stack = get_news()
         stack.insert(0, item)
         stack = stack[:MAX_STACK]
+        if blob_store.available() and blob_store.put_json(_BLOB_PATH, stack):
+            return
         try:
             _NEWS_FILE.write_text(json.dumps(stack, ensure_ascii=False, indent=2))
         except Exception as e:

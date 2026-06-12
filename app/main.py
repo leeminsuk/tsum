@@ -71,8 +71,30 @@ async def dashboard():
 
 # ── Crypto API ────────────────────────────────────────────────────────────────
 
+def _serverless_next_run() -> str:
+    """vercel.json crons("0 0 * * *") 기준 다음 실행 시각 — 다음 자정 UTC."""
+    from datetime import datetime, timedelta, timezone
+    now = datetime.now(timezone.utc)
+    nxt = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    return nxt.isoformat()
+
+
+def _ensure_signal(coin: str) -> None:
+    """서버리스에서 로컬 lifespan의 기동 시 분석을 대신함 — 데이터 없거나 낡으면 즉석 분석."""
+    cfg = load_settings()
+    if storage.has_recent_signal(coin, within_hours=float(cfg["interval_hours"])):
+        return
+    try:
+        from app.runner import run_analysis
+        run_analysis(coin=coin)
+    except Exception as exc:
+        logger.warning(f"Lazy analysis failed for {coin}: {exc}")
+
+
 @app.get("/api/signals")
 async def get_signals(coin: str | None = None):
+    if IS_SERVERLESS and coin and coin.lower() in SUPPORTED_COINS:
+        _ensure_signal(coin.lower())
     return storage.get_signals(coin=coin)
 
 
@@ -82,7 +104,7 @@ async def get_status(coin: str | None = None):
     signals = storage.get_signals(coin=coin)
     latest = signals[0] if signals else {}
     return {
-        "next_run": scheduler.get_next_run(),
+        "next_run": _serverless_next_run() if IS_SERVERLESS else scheduler.get_next_run(),
         "signal_count": len(signals),
         "max_stack": storage.MAX_STACK,
         "settings": cfg,
@@ -180,7 +202,16 @@ async def cron(request: Request):
 
 @app.get("/api/news")
 async def get_news():
-    return news_storage.get_news()
+    items = news_storage.get_news()
+    if IS_SERVERLESS and not items:
+        # 로컬 lifespan의 "뉴스 없으면 1회 분석"과 동일 동작
+        try:
+            from app.news_runner import run_news_analysis
+            run_news_analysis()
+            items = news_storage.get_news()
+        except Exception as exc:
+            logger.warning(f"Lazy news analysis failed: {exc}")
+    return items
 
 
 @app.post("/api/news/trigger")

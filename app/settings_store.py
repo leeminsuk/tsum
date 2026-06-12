@@ -28,9 +28,15 @@ def _supabase():
 
 _file_lock = threading.Lock()
 _FILE = Path(os.getenv("SETTINGS_FILE", "/tmp/tsum_settings.json"))
+_BLOB_PATH = "state/settings.json"
 
 
 def _file_load() -> dict:
+    from app import blob_store
+    if blob_store.available():
+        data = blob_store.get_json(_BLOB_PATH)
+        if data is not None:
+            return {**DEFAULTS, **data}
     try:
         if _FILE.exists():
             data = json.loads(_FILE.read_text(encoding="utf-8"))
@@ -41,6 +47,9 @@ def _file_load() -> dict:
 
 
 def _file_save(data: dict) -> None:
+    from app import blob_store
+    if blob_store.available() and blob_store.put_json(_BLOB_PATH, data):
+        return
     _FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 

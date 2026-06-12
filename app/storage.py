@@ -45,9 +45,15 @@ def _supabase():
 
 _file_lock = threading.Lock()
 _FILE = Path(os.getenv("STORAGE_FILE", "/tmp/tsum_signals.json"))
+_BLOB_PATH = "state/signals.json"
 
 
 def _file_load() -> list[dict]:
+    from app import blob_store
+    if blob_store.available():
+        data = blob_store.get_json(_BLOB_PATH)
+        if data is not None:
+            return data
     try:
         if _FILE.exists():
             return json.loads(_FILE.read_text(encoding="utf-8"))
@@ -57,6 +63,9 @@ def _file_load() -> list[dict]:
 
 
 def _file_save(signals: list[dict]) -> None:
+    from app import blob_store
+    if blob_store.available() and blob_store.put_json(_BLOB_PATH, signals):
+        return
     _FILE.write_text(json.dumps(signals, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
