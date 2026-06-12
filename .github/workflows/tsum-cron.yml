@@ -1,0 +1,17 @@
+name: tsum-cron
+
+# Vercel Hobby 크론은 일 1회 제한 — 5시간 주기 분석은 여기서 트리거한다
+on:
+  schedule:
+    - cron: '0 */5 * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger TSUM analysis
+        run: |
+          curl -fsS -m 280 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://tsum-eight.vercel.app/api/cron
