@@ -71,12 +71,22 @@ async def dashboard():
 
 # ── Crypto API ────────────────────────────────────────────────────────────────
 
-def _serverless_next_run() -> str:
-    """vercel.json crons("0 0 * * *") 기준 다음 실행 시각 — 다음 자정 UTC."""
+def _serverless_next_run(signals: list[dict], interval_hours: int) -> str:
+    """로컬 스케줄러와 동일 의미의 다음 분석 시각 — 마지막 시그널 + 주기.
+
+    지나면 프론트 60초 폴링이 /api/signals 경유 lazy 분석을 트리거하고,
+    GH Actions 크론(5시간)도 백그라운드에서 같은 주기로 돌린다."""
     from datetime import datetime, timedelta, timezone
     now = datetime.now(timezone.utc)
-    nxt = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-    return nxt.isoformat()
+    base = now
+    if signals:
+        try:
+            ts = signals[0].get("generated_at", "")
+            base = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        except Exception:
+            pass
+    nxt = base + timedelta(hours=interval_hours)
+    return (nxt if nxt > now else now).isoformat()
 
 
 def _ensure_signal(coin: str) -> None:
@@ -104,7 +114,7 @@ async def get_status(coin: str | None = None):
     signals = storage.get_signals(coin=coin)
     latest = signals[0] if signals else {}
     return {
-        "next_run": _serverless_next_run() if IS_SERVERLESS else scheduler.get_next_run(),
+        "next_run": _serverless_next_run(signals, cfg["interval_hours"]) if IS_SERVERLESS else scheduler.get_next_run(),
         "signal_count": len(signals),
         "max_stack": storage.MAX_STACK,
         "settings": cfg,
